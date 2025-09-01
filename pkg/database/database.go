@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/bluesky-social/indigo/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

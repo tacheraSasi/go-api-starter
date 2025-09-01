@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/bluesky-social/indigo/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -41,4 +42,6 @@ func GetDB() *gorm.DB {
 	return DB
 }
 
-func AutoMigrate() {}
+func AutoMigrate(models ...any) error {
+	return DB.AutoMigrate(models...)
+}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/tachRoutine/invoice-creator-api/internals/models"
 	"github.com/tachRoutine/invoice-creator-api/internals/repositories"
+	"github.com/tachRoutine/invoice-creator-api/internals/utils"
 )
 
 type InvoiceService interface {

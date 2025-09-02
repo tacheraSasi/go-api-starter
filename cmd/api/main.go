@@ -45,17 +45,17 @@ func main() {
 
 	// repositories
 	userRepo := repositories.NewUserRepository(database.GetDB())
-	customerRepo := repositories.NewCustomerRepository(database.GetDB())
+	// customerRepo := repositories.NewCustomerRepository(database.GetDB())
 	invoiceRepo := repositories.NewInvoiceRepository(database.GetDB())
 
 	// services
 	authService := services.NewAuthService(userRepo)
-	customerService := services.NewCustomerService(customerRepo)
+	// customerService := services.NewCustomerService(customerRepo)
 	invoiceService := services.NewInvoiceService(invoiceRepo)
 
 	// handlers
 	authHandler := handlers.NewAuthHandler(authService)
-	customerHandler := handlers.NewCustomerHandler(customerService)
+	// customerHandler := handlers.NewCustomerHandler(customerService)
 	invoiceHandler := handlers.NewInvoiceHandler(invoiceService)
 
 	// Setup router
@@ -77,13 +77,13 @@ func main() {
 	protected.Use(middlewares.AuthMiddleware())
 	{
 		// Customer routes
-		protected.GET("/customers", customerHandler.ListCustomers)
-		protected.GET("/customers/:id", customerHandler.GetCustomer)
-		protected.POST("/customers", customerHandler.CreateCustomer)
-		protected.PUT("/customers/:id", customerHandler.UpdateCustomer)
-		protected.DELETE("/customers/:id", customerHandler.DeleteCustomer)
+		// protected.GET("/customers", customerHandler.ListCustomers)
+		// protected.GET("/customers/:id", customerHandler.GetCustomer)
+		// protected.POST("/customers", customerHandler.CreateCustomer)
+		// protected.PUT("/customers/:id", customerHandler.UpdateCustomer)
+		// protected.DELETE("/customers/:id", customerHandler.DeleteCustomer)
 
-		// Invoice routes
+		// // Invoice routes
 		protected.GET("/invoices", invoiceHandler.ListInvoices)
 		protected.GET("/invoices/:id", invoiceHandler.GetInvoice)
 		protected.POST("/invoices", invoiceHandler.CreateInvoice)
@@ -95,7 +95,7 @@ func main() {
 	admin := r.Group("/api/v1/admin")
 	admin.Use(middlewares.AuthMiddleware(), middlewares.AdminMiddleware())
 	{
-		// Add admin-specific routes here
+		// TODO: Add admin specific routes here
 	}
 
 	// Start server

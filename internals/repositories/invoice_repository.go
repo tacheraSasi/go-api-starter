@@ -19,20 +19,24 @@ type invoiceRepository struct {
 	db *gorm.DB
 }
 
+// NewInvoiceRepository creates a new InvoiceRepository instance
 func NewInvoiceRepository(db *gorm.DB) InvoiceRepository {
 	return &invoiceRepository{db: db}
 }
 
+// Create inserts a new invoice record into the database
 func (r *invoiceRepository) Create(invoice *models.Invoice) error {
 	return r.db.Create(invoice).Error
 }
 
+// FindByID retrieves an invoice by its unique ID, including related customer and items
 func (r *invoiceRepository) FindByID(id uint) (*models.Invoice, error) {
 	var invoice models.Invoice
 	err := r.db.Preload("Customer").Preload("Items").First(&invoice, id).Error
 	return &invoice, err
 }
 
+// FindAll returns a paginated list of invoices and the total count
 func (r *invoiceRepository) FindAll(page, limit int) ([]models.Invoice, int64, error) {
 	var invoices []models.Invoice
 	var total int64
@@ -50,14 +54,17 @@ func (r *invoiceRepository) FindAll(page, limit int) ([]models.Invoice, int64, e
 	return invoices, total, err
 }
 
+// Update saves changes to an existing invoice
 func (r *invoiceRepository) Update(invoice *models.Invoice) error {
 	return r.db.Save(invoice).Error
 }
 
+// Delete removes an invoice record from the database by ID
 func (r *invoiceRepository) Delete(id uint) error {
 	return r.db.Delete(&models.Invoice{}, id).Error
 }
 
+// FindByCustomerID returns a paginated list of invoices for a given customer
 func (r *invoiceRepository) FindByCustomerID(customerID uint, page, limit int) ([]models.Invoice, int64, error) {
 	var invoices []models.Invoice
 	var total int64
@@ -76,6 +83,7 @@ func (r *invoiceRepository) FindByCustomerID(customerID uint, page, limit int) (
 	return invoices, total, err
 }
 
+// FindByInvoiceNumber retrieves an invoice by its invoice number, including related customer and items
 func (r *invoiceRepository) FindByInvoiceNumber(invoiceNumber string) (*models.Invoice, error) {
 	var invoice models.Invoice
 	err := r.db.Preload("Customer").Preload("Items").

@@ -22,10 +22,12 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	}
 }
 
+// CreateUser inserts a new user record into the database
 func (r *userRepository) CreateUser(user *models.User) error {
 	return r.db.Create(user).Error
 }
 
+// GetUserByID finds a user by their unique ID
 func (r *userRepository) GetUserByID(id string) (*models.User, error) {
 	var user models.User
 	if err := r.db.First(&user, "id = ?", id).Error; err != nil {
@@ -34,6 +36,7 @@ func (r *userRepository) GetUserByID(id string) (*models.User, error) {
 	return &user, nil
 }
 
+// GetUserByEmail finds a user by their email address
 func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := r.db.First(&user, "email = ?", email).Error; err != nil {
@@ -42,11 +45,12 @@ func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-
+// UpdateUser saves changes to an existing user
 func (r *userRepository) UpdateUser(user *models.User) error {
 	return r.db.Save(user).Error
 }
 
+// DeleteUser removes a user record from the database by ID
 func (r *userRepository) DeleteUser(id string) error {
 	return r.db.Delete(&models.User{}, "id = ?", id).Error
 }

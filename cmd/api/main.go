@@ -43,17 +43,17 @@ func main() {
 		log.Fatal("Auto migration failed:", err)
 	}
 
-	// Initialize repositories
+	// repositories
 	userRepo := repositories.NewUserRepository(database.GetDB())
 	customerRepo := repositories.NewCustomerRepository(database.GetDB())
 	invoiceRepo := repositories.NewInvoiceRepository(database.GetDB())
 
-	// Initialize services
+	// services
 	authService := services.NewAuthService(userRepo)
 	customerService := services.NewCustomerService(customerRepo)
 	invoiceService := services.NewInvoiceService(invoiceRepo)
 
-	// Initialize handlers
+	// handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	customerHandler := handlers.NewCustomerHandler(customerService)
 	invoiceHandler := handlers.NewInvoiceHandler(invoiceService)

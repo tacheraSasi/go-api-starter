@@ -1,6 +1,7 @@
 package services
 
 import (
+	"net/http"
 	"os/user"
 
 	"github.com/tachRoutine/invoice-creator-api/internals/models"
@@ -28,5 +29,14 @@ func (s *authService) Login(email, password string) (models.User, error){
 	if err := user.CheckPassword(password); err != nil {
 		return models.User{}, err
 	}
-	return user, nil
+	return *user, nil
+}
+
+func (s *authService) Register(user *models.User) error {
+	var existingUser *models.User
+	existingUser, _ = s.repo.GetUserByEmail(user.Email)
+	if existingUser != nil {
+		return http.ErrBodyNotAllowed
+	}
+	return nil
 }

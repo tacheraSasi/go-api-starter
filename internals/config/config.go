@@ -19,6 +19,7 @@ const (
 )
 
 type config struct {
+	DBType     string
 	DBHost     string
 	DBPort     string
 	DBUser     string
@@ -26,11 +27,13 @@ type config struct {
 	DBName     string
 	ServerPort string
 	JWTSecret  string
+	DBPath   string // For SQLite
 }
 
 func LoadConfig() *config{
 	godotenv.Load()
 	return &config{
+		DBType:     getEnv("DB_TYPE", "sqlite"),
 		DBHost:     getEnv("DB_HOST", "localhost"),
 		DBPort:     getEnv("DB_PORT", "5432"),
 		DBUser:     getEnv("DB_USER", "user"),
@@ -38,6 +41,7 @@ func LoadConfig() *config{
 		DBName:     getEnv("DB_NAME", "dbname"),
 		ServerPort: getEnv("SERVER_PORT", "8080"),
 		JWTSecret:  getEnv("JWT_SECRET", "secret"),
+		DBPath:  getEnv("DB_PATH", "invoice_creator.db"), // For SQLite
 	}
 }
 

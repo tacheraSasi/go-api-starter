@@ -20,13 +20,12 @@ func main() {
 	// Initialize logger
 	// logger.InitLogger()
 
-	// Connect to database
+	// Connect to database 
 	err := database.Connect(
-		cfg.DBHost,
-		cfg.DBPort,
-		cfg.DBUser,
-		cfg.DBPassword,
-		cfg.DBName,
+		database.DBConfig{
+			Type:	 cfg.DBType,
+			FilePath:	 cfg.DBPath,
+		},
 	)
 	if err != nil {
 		log.Fatal("Database connection failed:", err)

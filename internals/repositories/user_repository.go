@@ -8,6 +8,8 @@ import (
 type UserRepository interface {
 	CreateUser(user *models.User) error
 	GetUserByID(id string) (*models.User, error)
+	GetUserByEmailAndValidatePassword(email, password string) (*models.User, error)
+	GetUserByEmail(email string) (*models.User, error)
 	UpdateUser(user *models.User) error
 	DeleteUser(id string) error
 }
@@ -43,6 +45,18 @@ func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+// GetUserByEmailAndValidatePassword gets the user data and validate the password returns and error if failed
+func (r *userRepository) GetUserByEmailAndValidatePassword(email, password string) (*models.User, error) {
+	user, err := r.GetUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	if err := user.CheckPassword(password); err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // UpdateUser saves changes to an existing user

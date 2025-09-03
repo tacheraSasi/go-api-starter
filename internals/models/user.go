@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -15,4 +16,11 @@ type User struct {
 	Email     string         `gorm:"not null;uniqueIndex" json:"email"`
 	Password  string         `gorm:"not null" json:"-"`
 	Role      string         `gorm:"type:varchar(20);default:'user'" json:"role"` 
+}
+
+func (u *User) CheckPassword(password string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
+		return err
+	}
+	return nil
 }

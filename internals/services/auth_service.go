@@ -37,5 +37,8 @@ func (s *authService) Register(user *models.User) error {
 	if existingUser != nil {
 		return http.ErrBodyNotAllowed
 	}
-	return nil
+	if err := user.HashPassword(); err != nil {
+		return err
+	}
+	return s.repo.CreateUser(user)
 }

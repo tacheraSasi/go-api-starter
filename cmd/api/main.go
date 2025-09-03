@@ -18,7 +18,7 @@ func main() {
 	cfg := config.LoadConfig()
 
 	// Initialize logger
-	logger.InitLogger()
+	// logger.InitLogger()
 
 	// Connect to database
 	err := database.Connect(
@@ -83,7 +83,7 @@ func main() {
 		// protected.PUT("/customers/:id", customerHandler.UpdateCustomer)
 		// protected.DELETE("/customers/:id", customerHandler.DeleteCustomer)
 
-		// // Invoice routes
+		// Invoice routes
 		protected.GET("/invoices", invoiceHandler.ListInvoices)
 		protected.GET("/invoices/:id", invoiceHandler.GetInvoice)
 		protected.POST("/invoices", invoiceHandler.CreateInvoice)

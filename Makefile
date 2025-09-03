@@ -5,6 +5,9 @@ DEV_BINARY=bin/invoice-api
 dev:
 	go run ./cmd/api/main.go
 
+deps:
+	go mod tidy
+
 build:
 	go build -o $(DEV_BINARY) ./cmd/api/main.go
 

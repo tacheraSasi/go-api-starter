@@ -2,7 +2,6 @@ package services
 
 import (
 	"net/http"
-	"os/user"
 
 	"github.com/tachRoutine/invoice-creator-api/internals/models"
 	"github.com/tachRoutine/invoice-creator-api/internals/repositories"

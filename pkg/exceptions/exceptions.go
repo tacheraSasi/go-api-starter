@@ -1,18 +1,16 @@
-
 package exceptions
 
 import (
 	"errors"
 	"fmt"
+
+	"google.golang.org/protobuf/internal/encoding/messageset"
 )
-
-
 
 // NewNotFoundError returns an error indicating a resource was not found
 func NewNotFoundError(message string) error {
 	return fmt.Errorf("not found: %w", errors.New(message))
 }
-
 
 // NewValidationError returns an error indicating a validation failure
 func NewValidationError(message string) error {
@@ -37,4 +35,9 @@ func NewConflictError(message string) error {
 // NewInternalError returns an error indicating an internal server error
 func NewInternalError(message string) error {
 	return fmt.Errorf("internal error: %w", errors.New(message))
+}
+
+// NewBadRequestError returns an error indicating a bad request
+func NewBadRequestError(message string) error {
+	return fmt.Errorf("bad request: %w", errors.New(message))
 }

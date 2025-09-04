@@ -8,6 +8,7 @@ import (
 	"github.com/tachRoutine/invoice-creator-api/internals/dtos"
 	"github.com/tachRoutine/invoice-creator-api/internals/models"
 	"github.com/tachRoutine/invoice-creator-api/internals/services"
+	"github.com/tachRoutine/invoice-creator-api/pkg/jwt"
 	"github.com/tachRoutine/invoice-creator-api/pkg/styles"
 )
 
@@ -94,11 +95,18 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		})
 		return
 	}
-	
+	token, err := jwt.GenerateToken(user.ID, user.Email)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Failed to generate token",
+		})
+		return
+	}
 
 	c.JSON(200, gin.H{
 		"message": "Login successful",
 		"user":    user,
+		"token":   token,
 	})
 
 }

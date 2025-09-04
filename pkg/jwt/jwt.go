@@ -1,14 +1,16 @@
-package utils
+package jwt
 
 import (
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/tachRoutine/invoice-creator-api/internals/config"
 )
 
-var jwtSecret = []byte(config.LoadConfig().JWTSecret)
+var JwtSecret = []byte(config.LoadConfig().JWTSecret)
+var JwtExpiresIn = config.LoadConfig().JWTExpiresIn
 
 type Claims struct {
 	UserID uint   `json:"user_id"`
@@ -16,15 +18,15 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// ValidateJWT validates a JWT string and returns claims
-func ValidateJWT(tokenString string) (*Claims, error) {
+// ValidateToken validates a JWT string and returns claims
+func ValidateToken(tokenString string) (*Claims, error) {
 	// Parse the token
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (any, error) {
 		// Check signing method (important for security!)
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
-		return jwtSecret, nil
+		return JwtSecret, nil
 	})
 
 	if err != nil {
@@ -39,17 +41,21 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	return nil, errors.New("invalid token")
 }
 
-// GenerateJWT generates a new JWT token
-func GenerateJWT(userID uint, email string) (string, error) {
+// GenerateToken generates a new JWT token
+func GenerateToken(userID uint, email string) (string, error) {
+	JwtExpiresIn, err := strconv.Atoi(JwtExpiresIn)
+	if err != nil{
+		JwtExpiresIn = 24
+	}
 	claims := &Claims{
 		UserID: userID,
 		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(time.Duration(JwtExpiresIn).Hours()))),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString(JwtSecret)
 }

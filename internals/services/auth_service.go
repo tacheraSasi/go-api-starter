@@ -10,6 +10,8 @@ import (
 type AuthService interface {
 	Login(email, password string) (models.User, error)
 	Register(user *models.User) error
+	GetUserByID(id string) (*models.User, error)
+	GetUserByEmail(email string) (*models.User, error)
 }
 
 type authService struct {
@@ -41,4 +43,12 @@ func (s *authService) Register(user *models.User) error {
 		return err
 	}
 	return s.repo.CreateUser(user)
+}
+
+func (s *authService) GetUserByID(id string) (*models.User, error) {
+	return s.repo.GetUserByID(id)
+}
+
+func (s *authService) GetUserByEmail(email string) (*models.User, error) {
+	return s.repo.GetUserByEmail(email)
 }

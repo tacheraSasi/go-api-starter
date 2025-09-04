@@ -16,9 +16,9 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-logger, err := logger.NewLogger(cfg.LogFilePath)
-	if err != nil {
-		log.Fatal("Failed to initialize logger:", err)
+	logger, logErr := logger.NewLogger(cfg.LogFilePath)
+	if logErr != nil {
+		log.Fatal("Failed to initialize logger:", logErr)
 	}
 
 	// Connect to database 
@@ -62,7 +62,7 @@ logger, err := logger.NewLogger(cfg.LogFilePath)
 	r := gin.Default()
 
 	// Global middlewares
-	r.Use(middlewares.LoggingMiddleware())
+	r.Use(middlewares.LoggingMiddleware(logger))
 	r.Use(middlewares.CORSMiddleware())
 
 	// Public routes

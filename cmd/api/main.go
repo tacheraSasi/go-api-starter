@@ -62,7 +62,7 @@ func main() {
 	r := gin.Default()
 
 	// Global middlewares
-	r.Use(middlewares.LoggingMiddleware(logger))
+	r.Use(middlewares.LoggingMiddleware(logger.Logger))
 	r.Use(middlewares.CORSMiddleware())
 
 	// Public routes

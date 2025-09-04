@@ -11,14 +11,15 @@ import (
 	"github.com/tachRoutine/invoice-creator-api/internals/repositories"
 	"github.com/tachRoutine/invoice-creator-api/internals/services"
 	"github.com/tachRoutine/invoice-creator-api/pkg/database"
+	"github.com/tachRoutine/invoice-creator-api/pkg/logger"
 )
 
 func main() {
-	// Load configuration
 	cfg := config.LoadConfig()
-
-	// Initialize logger
-	// logger.InitLogger()
+	logger, logErr := logger.NewLogger(cfg.LogFilePath)
+	if logErr != nil {
+		log.Fatal("Failed to initialize logger:", logErr)
+	}
 
 	// Connect to database 
 	err := database.Connect(
@@ -61,7 +62,7 @@ func main() {
 	r := gin.Default()
 
 	// Global middlewares
-	r.Use(middlewares.LoggingMiddleware())
+	r.Use(middlewares.LoggingMiddleware(logger))
 	r.Use(middlewares.CORSMiddleware())
 
 	// Public routes

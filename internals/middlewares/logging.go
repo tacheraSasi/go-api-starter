@@ -1,17 +1,21 @@
 package middlewares
 
 import (
-	"log"
-	"strconv"
-
 	"github.com/gin-gonic/gin"
-	"github.com/tachRoutine/invoice-creator-api/pkg/styles"
+    "github.com/sirupsen/logrus"
 )
 
-func LoggingMiddleware() gin.HandlerFunc {
+func LoggingMiddleware(logger *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Println(styles.Request.Render("Request: %s %s", c.Request.Method, c.Request.URL.Path))
+		logger.WithFields(map[string]interface{}{
+			"method": c.Request.Method,
+			"path":   c.Request.URL.Path,
+		}).Info("Request received")
+
 		c.Next()
-		log.Println(styles.Response.Render("Response: %s", strconv.Itoa(c.Writer.Status()))) //TODO: Add response body logging
+
+		logger.WithFields(map[string]interface{}{
+			"status": c.Writer.Status(),
+		}).Info("Response sent")
 	}
 }

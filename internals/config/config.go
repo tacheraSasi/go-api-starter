@@ -30,6 +30,7 @@ type config struct {
 	JWTSecret    string
 	JWTExpiresIn string
 	DBPath       string // For SQLite
+	LogFilePath  string
 }
 
 func LoadConfig() *config {
@@ -45,6 +46,7 @@ func LoadConfig() *config {
 		JWTSecret:    getEnv("JWT_SECRET", "secret"),
 		JWTExpiresIn: getEnv("JWT_EXPIRES_IN", "24"),//In hours
 		DBPath:       getEnv("DB_PATH", "invoice_creator.db"), // For SQLite
+		LogFilePath: "logs/app.log", // Log file path
 	}
 }
 

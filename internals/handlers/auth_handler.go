@@ -32,9 +32,13 @@ func (h *AuthHandler) HealthCheck(c *gin.Context) {
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
+	var reqDto dtos.RegisterRequest
 	var requestBody = c.Request.Body
 	defer requestBody.Close()
-	h.ValidateRequest(c, requestBody)
+	h.ValidateRequest(c, &reqDto)
+	if c.IsAborted() {
+		return
+	}
 	bodyBytes, err := io.ReadAll(requestBody)
 	if err != nil {
 		log.Println("Failed to read request body:", err)
@@ -45,6 +49,32 @@ func (h *AuthHandler) Register(c *gin.Context) {
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
+	var reqDto dtos.LoginRequest
+	var requestBody = c.Request.Body
+	defer requestBody.Close()
+	h.ValidateRequest(c, &reqDto)
+	if c.IsAborted(){
+		return
+	}
+	bodyBytes, err := io.ReadAll(requestBody)
+	if err != nil {
+		log.Println("Failed to read request body:", err)
+		return
+	}
+	log.Println(styles.Request.Render(string(bodyBytes)))
+
+	user, err := h.service.Login(reqDto.Email, reqDto.Password)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Invalid email or password",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Login successful",
+		"user":    user,
+	})
 
 }
 

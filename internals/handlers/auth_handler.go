@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tachRoutine/invoice-creator-api/internals/dtos"
+	"github.com/tachRoutine/invoice-creator-api/internals/models"
 	"github.com/tachRoutine/invoice-creator-api/internals/services"
 	"github.com/tachRoutine/invoice-creator-api/pkg/styles"
 )
@@ -45,6 +46,22 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 	log.Println(styles.Request.Render(string(bodyBytes)))
+	err = h.service.Register(&models.User{
+		Email:    reqDto.Email,
+		Password: reqDto.Password,
+		Name:     reqDto.Name,
+	})
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(201, gin.H{
+		"message": "Registration successful",
+		"user":    user,
+	})
 
 }
 

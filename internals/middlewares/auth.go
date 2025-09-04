@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tachRoutine/invoice-creator-api/internals/utils"
+	"github.com/tachRoutine/invoice-creator-api/pkg/jwt"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -24,7 +25,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := utils.ValidateJWT(tokenString)
+		claims, err := jwt.ValidateToken(tokenString)
 		if err != nil {
 			utils.APIError(c, http.StatusUnauthorized, "Invalid token: "+err.Error())
 			c.Abort()

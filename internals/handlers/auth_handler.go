@@ -94,6 +94,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		})
 		return
 	}
+	
 
 	c.JSON(200, gin.H{
 		"message": "Login successful",
@@ -103,5 +104,5 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-
+	//TODO: Create a blacklist for JWT tokens
 }

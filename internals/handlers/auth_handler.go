@@ -57,6 +57,13 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		})
 		return
 	}
+	user, err := h.service.GetUserByEmail(reqDto.Email)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Failed to retrieve user after registration",
+		})
+		return
+	}
 
 	c.JSON(201, gin.H{
 		"message": "Registration successful",

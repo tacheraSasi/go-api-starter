@@ -10,6 +10,8 @@ import (
 type AuthService interface {
 	Login(email, password string) (models.User, error)
 	Register(user *models.User) error
+	GetUserByID(id string) (*models.User, error)
+	GetUserByEmail(email string) (*models.User, error)
 }
 
 type authService struct {

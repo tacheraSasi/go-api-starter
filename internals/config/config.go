@@ -43,7 +43,7 @@ func LoadConfig() *config {
 		DBName:       getEnv("DB_NAME", "dbname"),
 		ServerPort:   getEnv("SERVER_PORT", "8080"),
 		JWTSecret:    getEnv("JWT_SECRET", "secret"),
-		JWTExpiresIn: getEnv("JWT_EXPIRES_IN", "24h"),
+		JWTExpiresIn: getEnv("JWT_EXPIRES_IN", "24"),//In hours
 		DBPath:       getEnv("DB_PATH", "invoice_creator.db"), // For SQLite
 	}
 }

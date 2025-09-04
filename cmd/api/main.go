@@ -11,14 +11,15 @@ import (
 	"github.com/tachRoutine/invoice-creator-api/internals/repositories"
 	"github.com/tachRoutine/invoice-creator-api/internals/services"
 	"github.com/tachRoutine/invoice-creator-api/pkg/database"
+	"github.com/tachRoutine/invoice-creator-api/pkg/logger"
 )
 
 func main() {
-	// Load configuration
 	cfg := config.LoadConfig()
-
-	// Initialize logger
-	// logger.InitLogger()
+logger, err := logger.NewLogger(cfg.LogFilePath)
+	if err != nil {
+		log.Fatal("Failed to initialize logger:", err)
+	}
 
 	// Connect to database 
 	err := database.Connect(

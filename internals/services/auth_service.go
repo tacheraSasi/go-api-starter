@@ -42,3 +42,11 @@ func (s *authService) Register(user *models.User) error {
 	}
 	return s.repo.CreateUser(user)
 }
+
+func (s *authService) GetUserByID(id string) (*models.User, error) {
+	return s.repo.GetUserByID(id)
+}
+
+func (s *authService) GetUserByEmail(email string) (*models.User, error) {
+	return s.repo.GetUserByEmail(email)
+}

@@ -15,6 +15,7 @@ var JwtExpiresIn = config.LoadConfig().JWTExpiresIn
 type Claims struct {
 	UserID uint   `json:"user_id"`
 	Email  string `json:"email"`
+	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -44,11 +45,12 @@ func ValidateToken(tokenString string) (*Claims, error) {
 // GenerateToken generates a new JWT token
 func GenerateToken(userID uint, email string) (string, error) {
 	JwtExpiresIn, err := strconv.Atoi(JwtExpiresIn)
-	if err != nil{
+	if err != nil {
 		JwtExpiresIn = 24
 	}
 	claims := &Claims{
 		UserID: userID,
+		Role:   "user", //TODO: fetch role from DB
 		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(time.Duration(JwtExpiresIn).Hours()))),

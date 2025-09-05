@@ -11,3 +11,185 @@
   "status": 401,
   "time": "2025-09-05T09:23:21+03:00"
 }
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 1,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/login",
+  "request_id": "",
+  "response_size": 37,
+  "status": 401,
+  "time": "2025-09-05T09:30:29+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 0,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/login",
+  "request_id": "",
+  "response_size": 37,
+  "status": 401,
+  "time": "2025-09-05T09:30:39+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 77,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/register",
+  "request_id": "",
+  "response_size": 208,
+  "status": 201,
+  "time": "2025-09-05T09:31:15+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 0,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/login",
+  "request_id": "",
+  "response_size": 37,
+  "status": 401,
+  "time": "2025-09-05T09:31:26+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 0,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/login",
+  "request_id": "",
+  "response_size": 37,
+  "status": 401,
+  "time": "2025-09-05T09:31:28+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 1,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/register",
+  "request_id": "",
+  "response_size": 76,
+  "status": 400,
+  "time": "2025-09-05T09:31:57+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 3,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/register",
+  "request_id": "",
+  "response_size": 76,
+  "status": 400,
+  "time": "2025-09-05T09:32:09+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 81,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/login",
+  "request_id": "",
+  "response_size": 411,
+  "status": 200,
+  "time": "2025-09-05T09:39:43+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "",
+  "latency_ms": 0,
+  "level": "info",
+  "method": "GET",
+  "msg": "Request completed",
+  "path": "/api/v1/invoices",
+  "request_id": "",
+  "response_size": 52,
+  "status": 401,
+  "time": "2025-09-05T09:40:01+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "",
+  "latency_ms": 0,
+  "level": "info",
+  "method": "GET",
+  "msg": "Request completed",
+  "path": "/api/v1/invoices",
+  "request_id": "",
+  "response_size": 85,
+  "status": 401,
+  "time": "2025-09-05T09:40:19+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "",
+  "latency_ms": 2,
+  "level": "info",
+  "method": "GET",
+  "msg": "Request completed",
+  "path": "/api/v1/invoices",
+  "request_id": "",
+  "response_size": 85,
+  "status": 401,
+  "time": "2025-09-05T09:45:53+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "application/json",
+  "latency_ms": 90,
+  "level": "info",
+  "method": "POST",
+  "msg": "Request completed",
+  "path": "/api/v1/login",
+  "request_id": "",
+  "response_size": 411,
+  "status": 200,
+  "time": "2025-09-05T09:45:57+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}
+{
+  "client_ip": "::1",
+  "content_type": "",
+  "latency_ms": 4,
+  "level": "info",
+  "method": "GET",
+  "msg": "Request completed",
+  "path": "/api/v1/invoices",
+  "request_id": "",
+  "response_size": 99,
+  "status": 200,
+  "time": "2025-09-05T09:46:13+03:00",
+  "user_agent": "PostmanRuntime/7.45.0"
+}

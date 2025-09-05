@@ -23,7 +23,7 @@ func NewAuthService(repo repositories.UserRepository) AuthService {
 }
 
 func (s *authService) Login(email, password string) (models.User, error){
-	user, err := s.repo.GetUserByID(email)
+	user, err := s.repo.GetUserByEmail(email)
 	if err != nil {
 		return models.User{}, err
 	}

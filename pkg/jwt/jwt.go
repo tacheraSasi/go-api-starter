@@ -53,7 +53,7 @@ func GenerateToken(userID uint, email string) (string, error) {
 		Role:   "user", //TODO: fetch role from DB
 		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(time.Duration(JwtExpiresIn).Hours()))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(JwtExpiresIn))),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}

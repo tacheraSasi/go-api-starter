@@ -1,0 +1,13 @@
+{
+  "level": "info",
+  "method": "POST",
+  "msg": "Request received",
+  "path": "/api/v1/login",
+  "time": "2025-09-05T09:23:21+03:00"
+}
+{
+  "level": "info",
+  "msg": "Response sent",
+  "status": 401,
+  "time": "2025-09-05T09:23:21+03:00"
+}

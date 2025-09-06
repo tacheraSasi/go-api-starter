@@ -7,15 +7,14 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/tachRoutine/invoice-creator-api/internals/config"
+	"github.com/tachRoutine/invoice-creator-api/internals/models"
 )
 
 var JwtSecret = []byte(config.LoadConfig().JWTSecret)
 var JwtExpiresIn = config.LoadConfig().JWTExpiresIn
 
 type Claims struct {
-	UserID uint   `json:"user_id"`
-	Email  string `json:"email"`
-	Role   string `json:"role"`
+	User models.User `json:"user"`
 	jwt.RegisteredClaims
 }
 
@@ -43,15 +42,13 @@ func ValidateToken(tokenString string) (*Claims, error) {
 }
 
 // GenerateToken generates a new JWT token
-func GenerateToken(userID uint, email string) (string, error) {
+func GenerateToken(user models.User) (string, error) {
 	JwtExpiresIn, err := strconv.Atoi(JwtExpiresIn)
 	if err != nil {
 		JwtExpiresIn = 24
 	}
 	claims := &Claims{
-		UserID: userID,
-		Role:   "user", //TODO: fetch role from DB
-		Email:  email,
+		User: user,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(JwtExpiresIn))),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

@@ -2,6 +2,7 @@ package services
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/tachRoutine/invoice-creator-api/internals/models"
 	"github.com/tachRoutine/invoice-creator-api/internals/repositories"
@@ -12,17 +13,19 @@ type AuthService interface {
 	Register(user *models.User) error
 	GetUserByID(id string) (*models.User, error)
 	GetUserByEmail(email string) (*models.User, error)
+	Logout(token string, expiresAt time.Time) error
 }
 
 type authService struct {
-	repo repositories.UserRepository
+	repo         repositories.UserRepository
+	tokenService TokenService
 }
 
-func NewAuthService(repo repositories.UserRepository) AuthService {
-	return &authService{repo: repo}
+func NewAuthService(repo repositories.UserRepository, tokenService TokenService) AuthService {
+	return &authService{repo: repo, tokenService: tokenService}
 }
 
-func (s *authService) Login(email, password string) (models.User, error){
+func (s *authService) Login(email, password string) (models.User, error) {
 	user, err := s.repo.GetUserByEmail(email)
 	if err != nil {
 		return models.User{}, err
@@ -51,4 +54,8 @@ func (s *authService) GetUserByID(id string) (*models.User, error) {
 
 func (s *authService) GetUserByEmail(email string) (*models.User, error) {
 	return s.repo.GetUserByEmail(email)
+}
+
+func (s *authService) Logout(token string, expiresAt time.Time) error {
+	return s.tokenService.BlacklistToken(token, expiresAt)
 }

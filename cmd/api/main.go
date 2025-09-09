@@ -38,6 +38,7 @@ func main() {
 		&models.Customer{},
 		&models.Invoice{},
 		&models.InvoiceItem{},
+		&models.BlacklistedToken{},
 	)
 	if err != nil {
 		log.Fatal("Auto migration failed:", err)
@@ -45,17 +46,19 @@ func main() {
 
 	// repositories
 	userRepo := repositories.NewUserRepository(database.GetDB())
-	// customerRepo := repositories.NewCustomerRepository(database.GetDB())
+	customerRepo := repositories.NewCustomerRepository(database.GetDB())
 	invoiceRepo := repositories.NewInvoiceRepository(database.GetDB())
+	tokenRepo := repositories.NewTokenRepository(database.GetDB())
 
 	// services
-	authService := services.NewAuthService(userRepo)
-	// customerService := services.NewCustomerService(customerRepo)
+	tokenService := services.NewTokenService(tokenRepo)
+	authService := services.NewAuthService(userRepo, tokenService)
+	customerService := services.NewCustomerService(customerRepo)
 	invoiceService := services.NewInvoiceService(invoiceRepo)
 
 	// handlers
-	authHandler := handlers.NewAuthHandler(authService)
-	// customerHandler := handlers.NewCustomerHandler(customerService)
+	authHandler := handlers.NewAuthHandler(authService, cfg)
+	customerHandler := handlers.NewCustomerHandler(customerService)
 	invoiceHandler := handlers.NewInvoiceHandler(invoiceService)
 
 	// Setup router
@@ -74,14 +77,15 @@ func main() {
 
 	// Protected routes
 	protected := r.Group("/api/v1")
-	protected.Use(middlewares.AuthMiddleware())
+	protected.Use(middlewares.AuthMiddleware(tokenService, []byte(cfg.JWTSecret)))
 	{
+		protected.POST("/logout", authHandler.Logout)
 		// Customer routes
-		// protected.GET("/customers", customerHandler.ListCustomers)
-		// protected.GET("/customers/:id", customerHandler.GetCustomer)
-		// protected.POST("/customers", customerHandler.CreateCustomer)
-		// protected.PUT("/customers/:id", customerHandler.UpdateCustomer)
-		// protected.DELETE("/customers/:id", customerHandler.DeleteCustomer)
+		protected.GET("/customers", customerHandler.ListCustomers)
+		protected.GET("/customers/:id", customerHandler.GetCustomer)
+		protected.POST("/customers", customerHandler.CreateCustomer)
+		protected.PUT("/customers/:id", customerHandler.UpdateCustomer)
+		protected.DELETE("/customers/:id", customerHandler.DeleteCustomer)
 
 		// Invoice routes
 		protected.GET("/invoices", invoiceHandler.ListInvoices)
@@ -93,12 +97,12 @@ func main() {
 
 	// Admin routes
 	admin := r.Group("/api/v1/admin")
-	admin.Use(middlewares.AuthMiddleware(), middlewares.AdminMiddleware())
+	admin.Use(middlewares.AuthMiddleware(tokenService, []byte(cfg.JWTSecret)), middlewares.AdminMiddleware())
 	{
 		// TODO: Add admin specific routes here
 	}
 
 	// Start server
 	log.Printf("Server starting on :%s", cfg.ServerPort)
-	r.Run(":" + cfg.ServerPort)
+	log.Fatal(r.Run(":" + cfg.ServerPort))
 }

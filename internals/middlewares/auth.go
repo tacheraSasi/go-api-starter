@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tachRoutine/invoice-creator-api/internals/services"
 	"github.com/tachRoutine/invoice-creator-api/internals/utils"
 	"github.com/tachRoutine/invoice-creator-api/pkg/jwt"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(tokenService services.TokenService, jwtSecret []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -25,15 +26,28 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := jwt.ValidateToken(tokenString)
+		isBlacklisted, err := tokenService.IsTokenBlacklisted(tokenString)
+		if err != nil {
+			utils.APIError(c, http.StatusInternalServerError, "Failed to check token")
+			c.Abort()
+			return
+		}
+
+		if isBlacklisted {
+			utils.APIError(c, http.StatusUnauthorized, "Token is blacklisted")
+			c.Abort()
+			return
+		}
+
+		claims, err := jwt.ValidateToken(tokenString, jwtSecret)
 		if err != nil {
 			utils.APIError(c, http.StatusUnauthorized, "Invalid token: "+err.Error())
 			c.Abort()
 			return
 		}
 
-		c.Set("userID", claims.UserID)
-		c.Set("userRole", claims.Role)
+		c.Set("userID", claims.User.ID)
+		c.Set("userRole", claims.User.Role)
 		c.Next()
 	}
 }
@@ -49,3 +63,4 @@ func AdminMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+

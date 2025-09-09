@@ -3,8 +3,10 @@ package handlers
 import (
 	"io"
 	"log"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tachRoutine/invoice-creator-api/internals/config"
 	"github.com/tachRoutine/invoice-creator-api/internals/dtos"
 	"github.com/tachRoutine/invoice-creator-api/internals/models"
 	"github.com/tachRoutine/invoice-creator-api/internals/services"
@@ -14,11 +16,13 @@ import (
 
 type AuthHandler struct {
 	service services.AuthService
+	cfg     *config.Config
 }
 
-func NewAuthHandler(service services.AuthService) *AuthHandler {
+func NewAuthHandler(service services.AuthService, cfg *config.Config) *AuthHandler {
 	return &AuthHandler{
 		service: service,
+		cfg:     cfg,
 	}
 }
 
@@ -95,7 +99,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		})
 		return
 	}
-	token, err := jwt.GenerateToken(user)
+	token, err := jwt.GenerateToken(user, []byte(h.cfg.JWTSecret), h.cfg.JWTExpiresIn)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "Failed to generate token",
@@ -112,5 +116,26 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-	//TODO: Create a blacklist for JWT tokens
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.JSON(401, gin.H{"error": "Authorization header is missing"})
+		return
+	}
+
+	tokenString := strings.Split(authHeader, " ")[1]
+
+	claims, err := jwt.ValidateToken(tokenString, []byte(h.cfg.JWTSecret))
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	expiresAt := claims.ExpiresAt.Time
+
+	if err := h.service.Logout(tokenString, expiresAt); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to logout"})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Logout successful"})
 }

@@ -6,12 +6,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/tachRoutine/invoice-creator-api/internals/config"
 	"github.com/tachRoutine/invoice-creator-api/internals/models"
 )
-
-var JwtSecret = []byte(config.LoadConfig().JWTSecret)
-var JwtExpiresIn = config.LoadConfig().JWTExpiresIn
 
 type Claims struct {
 	User models.User `json:"user"`
@@ -19,14 +15,14 @@ type Claims struct {
 }
 
 // ValidateToken validates a JWT string and returns claims
-func ValidateToken(tokenString string) (*Claims, error) {
+func ValidateToken(tokenString string, jwtSecret []byte) (*Claims, error) {
 	// Parse the token
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (any, error) {
 		// Check signing method (important for security!)
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
-		return JwtSecret, nil
+		return jwtSecret, nil
 	})
 
 	if err != nil {
@@ -42,19 +38,20 @@ func ValidateToken(tokenString string) (*Claims, error) {
 }
 
 // GenerateToken generates a new JWT token
-func GenerateToken(user models.User) (string, error) {
-	JwtExpiresIn, err := strconv.Atoi(JwtExpiresIn)
+func GenerateToken(user models.User, jwtSecret []byte, jwtExpiresIn string) (string, error) {
+	expiresIn, err := strconv.Atoi(jwtExpiresIn)
 	if err != nil {
-		JwtExpiresIn = 24
+		expiresIn = 24
 	}
 	claims := &Claims{
 		User: user,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(JwtExpiresIn))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(expiresIn))),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(JwtSecret)
+	return token.SignedString(jwtSecret)
 }
+

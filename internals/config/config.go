@@ -19,7 +19,7 @@ const (
 	JWTExpiresInKey ConfigKey = "JWT_EXPIRES_IN"
 )
 
-type config struct {
+type Config struct {
 	DBType       string
 	DBHost       string
 	DBPort       string
@@ -33,9 +33,9 @@ type config struct {
 	LogFilePath  string
 }
 
-func LoadConfig() *config {
+func LoadConfig() *Config {
 	godotenv.Load()
-	return &config{
+	return &Config{
 		DBType:       getEnv("DB_TYPE", "sqlite"),
 		DBHost:       getEnv("DB_HOST", "localhost"),
 		DBPort:       getEnv("DB_PORT", "5432"),
@@ -50,7 +50,7 @@ func LoadConfig() *config {
 	}
 }
 
-func (c *config) Get(key ConfigKey) string {
+func (c *Config) Get(key ConfigKey) string {
 	values := map[ConfigKey]string{
 		DBHostKey:       c.DBHost,
 		DBPortKey:       c.DBPort,

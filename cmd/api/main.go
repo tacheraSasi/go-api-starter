@@ -66,7 +66,7 @@ func main() {
 
 	// Global middlewares
 	r.Use(middlewares.LoggingMiddleware(logger.Logger))
-	r.Use(middlewares.CORSMiddleware())
+	r.Use(middlewares.CORSMiddleware("*"))
 
 	// Public routes
 	public := r.Group("/api/v1")

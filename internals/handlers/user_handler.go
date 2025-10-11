@@ -22,7 +22,7 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 // GetUser handles GET /users/:id
 func (h *UserHandler) GetUser(c *gin.Context) {
 	id := c.Param("id")
-	
+
 	user, err := h.userService.GetUserWithRoles(id)
 	if err != nil {
 		utils.APIError(c, http.StatusNotFound, err.Error())

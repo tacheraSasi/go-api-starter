@@ -110,6 +110,14 @@ func main() {
 	protected.Use(middlewares.AuthMiddleware(tokenService, []byte(cfg.JWTSecret)))
 	{
 		protected.POST("/logout", authHandler.Logout)
+		
+		// User routes
+		protected.GET("/users/:id", userHandler.GetUser)
+		protected.PUT("/users/:id", userHandler.UpdateUser)
+		protected.PUT("/users/:id/password", userHandler.UpdateUserPassword)
+		protected.GET("/users/:id/roles", userHandler.GetUserRoles)
+		protected.GET("/users/:id/permissions/:resource/:action", userHandler.CheckUserPermission)
+		
 		// Customer routes
 		protected.GET("/customers", customerHandler.ListCustomers)
 		protected.GET("/customers/:id", customerHandler.GetCustomer)
@@ -129,7 +137,29 @@ func main() {
 	admin := r.Group("/api/v1/admin")
 	admin.Use(middlewares.AuthMiddleware(tokenService, []byte(cfg.JWTSecret)), middlewares.AdminMiddleware())
 	{
-		// TODO: Add admin specific routes here
+		// User management
+		admin.GET("/users", userHandler.ListUsers)
+		admin.DELETE("/users/:id", userHandler.DeleteUser)
+		admin.POST("/users/:id/roles/:roleId", userHandler.AddRoleToUser)
+		admin.DELETE("/users/:id/roles/:roleId", userHandler.RemoveRoleFromUser)
+		
+		// Role management
+		admin.POST("/roles", roleHandler.CreateRole)
+		admin.GET("/roles", roleHandler.ListRoles)
+		admin.GET("/roles/:id", roleHandler.GetRole)
+		admin.PUT("/roles/:id", roleHandler.UpdateRole)
+		admin.DELETE("/roles/:id", roleHandler.DeleteRole)
+		admin.POST("/roles/:id/permissions/:permissionId", roleHandler.AddPermissionToRole)
+		admin.DELETE("/roles/:id/permissions/:permissionId", roleHandler.RemovePermissionFromRole)
+		
+		// Permission management
+		admin.POST("/permissions", permissionHandler.CreatePermission)
+		admin.GET("/permissions", permissionHandler.ListPermissions)
+		admin.GET("/permissions/:id", permissionHandler.GetPermission)
+		admin.PUT("/permissions/:id", permissionHandler.UpdatePermission)
+		admin.DELETE("/permissions/:id", permissionHandler.DeletePermission)
+		admin.GET("/permissions/resources", permissionHandler.GetAllResources)
+		admin.GET("/permissions/resources/:resource/actions", permissionHandler.GetResourceActions)
 	}
 
 	// Start server

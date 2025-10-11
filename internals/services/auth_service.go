@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/tachRoutine/invoice-creator-api/internals/models"
-	"github.com/tachRoutine/invoice-creator-api/internals/repositories"
+	"github.com/tacheraSasi/go-api-starter/internals/models"
+	"github.com/tacheraSasi/go-api-starter/internals/repositories"
 )
 
 type AuthService interface {

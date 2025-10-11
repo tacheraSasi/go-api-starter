@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/tachRoutine/invoice-creator-api/internals/models"
+	"github.com/tacheraSasi/go-api-starter/internals/models"
 )
 
 type Claims struct {

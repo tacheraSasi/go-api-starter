@@ -1,4 +1,4 @@
-module github.com/tachRoutine/invoice-creator-api
+module github.com/tacheraSasi/go-api-starter
 
 go 1.25.0
 

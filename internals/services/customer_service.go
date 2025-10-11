@@ -3,9 +3,9 @@ package services
 import (
 	"errors"
 
-	"github.com/tachRoutine/invoice-creator-api/internals/models"
-	"github.com/tachRoutine/invoice-creator-api/internals/repositories"
-	"github.com/tachRoutine/invoice-creator-api/internals/utils"
+	"github.com/tacheraSasi/go-api-starter/internals/models"
+	"github.com/tacheraSasi/go-api-starter/internals/repositories"
+	"github.com/tacheraSasi/go-api-starter/internals/utils"
 )
 
 type CustomerService interface {

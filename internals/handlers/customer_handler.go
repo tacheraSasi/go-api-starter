@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tachRoutine/invoice-creator-api/internals/models"
-	"github.com/tachRoutine/invoice-creator-api/internals/services"
-	"github.com/tachRoutine/invoice-creator-api/internals/utils"
+	"github.com/tacheraSasi/go-api-starter/internals/models"
+	"github.com/tacheraSasi/go-api-starter/internals/services"
+	"github.com/tacheraSasi/go-api-starter/internals/utils"
 )
 
 type CustomerHandler struct {

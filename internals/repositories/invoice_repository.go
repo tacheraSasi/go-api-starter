@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/tachRoutine/invoice-creator-api/internals/models"
+	"github.com/tacheraSasi/go-api-starter/internals/models"
 	"gorm.io/gorm"
 )
 

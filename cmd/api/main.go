@@ -4,14 +4,14 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tachRoutine/invoice-creator-api/internals/config"
-	"github.com/tachRoutine/invoice-creator-api/internals/handlers"
-	"github.com/tachRoutine/invoice-creator-api/internals/middlewares"
-	"github.com/tachRoutine/invoice-creator-api/internals/models"
-	"github.com/tachRoutine/invoice-creator-api/internals/repositories"
-	"github.com/tachRoutine/invoice-creator-api/internals/services"
-	"github.com/tachRoutine/invoice-creator-api/pkg/database"
-	"github.com/tachRoutine/invoice-creator-api/pkg/logger"
+	"github.com/tacheraSasi/go-api-starter/internals/config"
+	"github.com/tacheraSasi/go-api-starter/internals/handlers"
+	"github.com/tacheraSasi/go-api-starter/internals/middlewares"
+	"github.com/tacheraSasi/go-api-starter/internals/models"
+	"github.com/tacheraSasi/go-api-starter/internals/repositories"
+	"github.com/tacheraSasi/go-api-starter/internals/services"
+	"github.com/tacheraSasi/go-api-starter/pkg/database"
+	"github.com/tacheraSasi/go-api-starter/pkg/logger"
 )
 
 func main() {

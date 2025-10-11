@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tachRoutine/invoice-creator-api/internals/services"
-	"github.com/tachRoutine/invoice-creator-api/internals/utils"
-	"github.com/tachRoutine/invoice-creator-api/pkg/jwt"
+	"github.com/tacheraSasi/go-api-starter/internals/services"
+	"github.com/tacheraSasi/go-api-starter/internals/utils"
+	"github.com/tacheraSasi/go-api-starter/pkg/jwt"
 )
 
 func AuthMiddleware(tokenService services.TokenService, jwtSecret []byte) gin.HandlerFunc {

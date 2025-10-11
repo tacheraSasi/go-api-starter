@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tachRoutine/invoice-creator-api/internals/config"
-	"github.com/tachRoutine/invoice-creator-api/internals/dtos"
-	"github.com/tachRoutine/invoice-creator-api/internals/models"
-	"github.com/tachRoutine/invoice-creator-api/internals/services"
-	"github.com/tachRoutine/invoice-creator-api/pkg/jwt"
-	"github.com/tachRoutine/invoice-creator-api/pkg/styles"
+	"github.com/tacheraSasi/go-api-starter/internals/config"
+	"github.com/tacheraSasi/go-api-starter/internals/dtos"
+	"github.com/tacheraSasi/go-api-starter/internals/models"
+	"github.com/tacheraSasi/go-api-starter/internals/services"
+	"github.com/tacheraSasi/go-api-starter/pkg/jwt"
+	"github.com/tacheraSasi/go-api-starter/pkg/styles"
 )
 
 type AuthHandler struct {

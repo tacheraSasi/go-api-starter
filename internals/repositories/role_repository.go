@@ -35,11 +35,11 @@ func (r *RoleRepository) GetByName(name string) (*models.Role, error) {
 // List retrieves all roles with optional filters
 func (r *RoleRepository) List(limit, offset int, activeOnly bool) ([]models.Role, error) {
 	query := r.db.Preload("Permissions")
-	
+
 	if activeOnly {
 		query = query.Where("is_active = ?", true)
 	}
-	
+
 	var roles []models.Role
 	err := query.Limit(limit).Offset(offset).Find(&roles).Error
 	return roles, err

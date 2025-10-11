@@ -42,11 +42,11 @@ func (p *PermissionRepository) GetByResourceAndAction(resource, action string) (
 // List retrieves all permissions with optional filters
 func (p *PermissionRepository) List(limit, offset int, resource string) ([]models.Permission, error) {
 	query := p.db.Model(&models.Permission{})
-	
+
 	if resource != "" {
 		query = query.Where("resource = ?", resource)
 	}
-	
+
 	var permissions []models.Permission
 	err := query.Limit(limit).Offset(offset).Find(&permissions).Error
 	return permissions, err

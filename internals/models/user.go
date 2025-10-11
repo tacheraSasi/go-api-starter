@@ -18,9 +18,9 @@ type User struct {
 	IsActive  bool           `gorm:"default:true" json:"is_active"`
 	LastLogin *time.Time     `json:"last_login,omitempty"`
 	Roles     []Role         `gorm:"many2many:user_roles;" json:"roles,omitempty"`
-	
+
 	// Legacy field for backward compatibility
-	Role      string         `gorm:"type:varchar(20);default:'user'" json:"role"` 
+	Role string `gorm:"type:varchar(20);default:'user'" json:"role"`
 }
 
 func (u *User) CheckPassword(password string) error {
@@ -56,8 +56,8 @@ func (u *User) HasPermission(resource, action string) bool {
 			continue
 		}
 		for _, permission := range role.Permissions {
-			if permission.Resource == resource && 
-			   (permission.Action == action || permission.Action == ActionManage) {
+			if permission.Resource == resource &&
+				(permission.Action == action || permission.Action == ActionManage) {
 				return true
 			}
 		}
@@ -68,7 +68,7 @@ func (u *User) HasPermission(resource, action string) bool {
 // GetPermissions returns all permissions for the user
 func (u *User) GetPermissions() []Permission {
 	permissionMap := make(map[uint]Permission)
-	
+
 	for _, role := range u.Roles {
 		if !role.IsActive {
 			continue
@@ -77,12 +77,12 @@ func (u *User) GetPermissions() []Permission {
 			permissionMap[permission.ID] = permission
 		}
 	}
-	
+
 	permissions := make([]Permission, 0, len(permissionMap))
 	for _, permission := range permissionMap {
 		permissions = append(permissions, permission)
 	}
-	
+
 	return permissions
 }
 

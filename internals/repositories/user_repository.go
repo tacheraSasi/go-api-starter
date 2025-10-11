@@ -97,11 +97,11 @@ func (r *userRepository) DeleteUser(id string) error {
 // ListUsers retrieves all users with optional filters
 func (r *userRepository) ListUsers(limit, offset int, activeOnly bool) ([]models.User, error) {
 	query := r.db.Preload("Roles")
-	
+
 	if activeOnly {
 		query = query.Where("is_active = ?", true)
 	}
-	
+
 	var users []models.User
 	err := query.Limit(limit).Offset(offset).Find(&users).Error
 	return users, err

@@ -24,11 +24,69 @@ profile.cov
 go.work
 go.work.sum
 
-# env file
+# Environment variables
 .env
+.env.local
+.env.*.local
 
-#DB
+# Database files
+data/
 *.db
-# Editor/IDE
-# .idea/
-# .vscode/
+*.sqlite
+*.sqlite3
+
+# Build artifacts
+bin/
+tmp/
+dist/
+
+# Logs
+logs/
+*.log
+build-errors.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test coverage
+coverage.html
+coverage.txt
+
+# Temporary files
+*.tmp
+*.temp
+
+# Air (hot reload)
+tmp/
+
+# Security files
+*.pem
+*.key
+*.crt
+*.p12
+*.p8
+
+# Local configuration
+config.local.yaml
+config.local.json
+
+# Node modules (if using any JS tools)
+node_modules/
+
+# Python (if using any Python tools)
+__pycache__/
+*.py[cod]
+*$py.class

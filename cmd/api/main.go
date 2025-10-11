@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tacheraSasi/go-api-starter/internals/config"
@@ -67,6 +68,15 @@ func main() {
 	// Global middlewares
 	r.Use(middlewares.LoggingMiddleware(logger.Logger))
 	r.Use(middlewares.CORSMiddleware("*"))
+
+	// Health check route
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":    "ok",
+			"message":   "Go API Starter is running",
+			"timestamp": time.Now().UTC(),
+		})
+	})
 
 	// Public routes
 	public := r.Group("/api/v1")

@@ -21,11 +21,11 @@ func main() {
 		log.Fatal("Failed to initialize logger:", logErr)
 	}
 
-	// Connect to database 
+	// Connect to database
 	err := database.Connect(
 		database.DBConfig{
-			Type:	 cfg.DBType,
-			FilePath:	 cfg.DBPath,
+			Type:     cfg.DBType,
+			FilePath: cfg.DBPath,
 		},
 	)
 	if err != nil {

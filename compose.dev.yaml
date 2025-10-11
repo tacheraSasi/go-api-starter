@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - GIN_MODE=debug
+      - DB_TYPE=postgres
+      - DB_PATH=postgres://postgres:password@db:5432/go_api_starter_dev?sslmode=disable
+    volumes:
+      - .:/app
+      - /app/bin
+    command: go run /app/cmd/api/main.go
+    ports:
+      - "8080:8080"
+      - "2345:2345" # Delve debugger port
+
+  # Adminer for database management
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8081:8080"
+    networks:
+      - app-network
+    restart: unless-stopped

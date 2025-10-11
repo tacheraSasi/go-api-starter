@@ -36,6 +36,10 @@ func main() {
 	// Auto migrate models
 	err = database.AutoMigrate(
 		&models.User{},
+		&models.Role{},
+		&models.Permission{},
+		&models.UserRole{},
+		&models.RolePermission{},
 		&models.Customer{},
 		&models.Invoice{},
 		&models.InvoiceItem{},
@@ -47,15 +51,28 @@ func main() {
 
 	// repositories
 	userRepo := repositories.NewUserRepository(database.GetDB())
+	roleRepo := repositories.NewRoleRepository(database.GetDB())
+	permissionRepo := repositories.NewPermissionRepository(database.GetDB())
 	customerRepo := repositories.NewCustomerRepository(database.GetDB())
 	invoiceRepo := repositories.NewInvoiceRepository(database.GetDB())
 	tokenRepo := repositories.NewTokenRepository(database.GetDB())
 
 	// services
+	permissionService := services.NewPermissionService(permissionRepo)
+	roleService := services.NewRoleService(roleRepo, permissionRepo)
+	userService := services.NewUserService(userRepo, roleRepo)
 	tokenService := services.NewTokenService(tokenRepo)
 	authService := services.NewAuthService(userRepo, tokenService)
 	customerService := services.NewCustomerService(customerRepo)
 	invoiceService := services.NewInvoiceService(invoiceRepo)
+
+	// Initialize default roles and permissions
+	if err := permissionService.InitializeDefaultPermissions(); err != nil {
+		log.Printf("Warning: Failed to initialize default permissions: %v", err)
+	}
+	if err := roleService.InitializeDefaultRoles(); err != nil {
+		log.Printf("Warning: Failed to initialize default roles: %v", err)
+	}
 
 	// handlers
 	authHandler := handlers.NewAuthHandler(authService, cfg)

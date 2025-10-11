@@ -25,7 +25,7 @@ func NewUserService(userRepo repositories.UserRepository, roleRepo *repositories
 // CreateUser creates a new user with default role
 func (s *UserService) CreateUser(name, email, password string) (*models.User, error) {
 	// Check if user already exists
-	_, err := (*s.userRepo).GetUserByEmail(email)
+	_, err := s.userRepo.GetUserByEmail(email)
 	if err == nil {
 		return nil, errors.New("user already exists")
 	}
@@ -47,7 +47,7 @@ func (s *UserService) CreateUser(name, email, password string) (*models.User, er
 	}
 
 	// Create user
-	err = (*s.userRepo).CreateUser(user)
+	err = s.userRepo.CreateUser(user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
@@ -55,7 +55,7 @@ func (s *UserService) CreateUser(name, email, password string) (*models.User, er
 	// Assign default role
 	defaultRole, err := s.roleRepo.GetByName(models.RoleUser)
 	if err == nil {
-		_ = (*s.userRepo).AddRoleToUser(user.ID, defaultRole.ID)
+		_ = s.userRepo.AddRoleToUser(user.ID, defaultRole.ID)
 	}
 
 	return user, nil
@@ -63,7 +63,7 @@ func (s *UserService) CreateUser(name, email, password string) (*models.User, er
 
 // GetUser retrieves a user by ID
 func (s *UserService) GetUser(id string) (*models.User, error) {
-	user, err := (*s.userRepo).GetUserByID(id)
+	user, err := s.userRepo.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
@@ -75,7 +75,7 @@ func (s *UserService) GetUser(id string) (*models.User, error) {
 
 // GetUserWithRoles retrieves a user by ID with roles and permissions
 func (s *UserService) GetUserWithRoles(id string) (*models.User, error) {
-	user, err := (*s.userRepo).GetUserByIDWithRoles(id)
+	user, err := s.userRepo.GetUserByIDWithRoles(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
@@ -87,7 +87,7 @@ func (s *UserService) GetUserWithRoles(id string) (*models.User, error) {
 
 // GetUserByEmail retrieves a user by email
 func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
-	user, err := (*s.userRepo).GetUserByEmail(email)
+	user, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
@@ -99,7 +99,7 @@ func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
 
 // GetUserByEmailWithRoles retrieves a user by email with roles and permissions
 func (s *UserService) GetUserByEmailWithRoles(email string) (*models.User, error) {
-	user, err := (*s.userRepo).GetUserByEmailWithRoles(email)
+	user, err := s.userRepo.GetUserByEmailWithRoles(email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
@@ -111,7 +111,7 @@ func (s *UserService) GetUserByEmailWithRoles(email string) (*models.User, error
 
 // ListUsers retrieves all users
 func (s *UserService) ListUsers(limit, offset int, activeOnly bool) ([]models.User, error) {
-	users, err := (*s.userRepo).ListUsers(limit, offset, activeOnly)
+	users, err := s.userRepo.ListUsers(limit, offset, activeOnly)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list users: %w", err)
 	}
@@ -120,7 +120,7 @@ func (s *UserService) ListUsers(limit, offset int, activeOnly bool) ([]models.Us
 
 // UpdateUser updates user information
 func (s *UserService) UpdateUser(id string, name, email string, isActive *bool) (*models.User, error) {
-	user, err := (*s.userRepo).GetUserByID(id)
+	user, err := s.userRepo.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
@@ -134,7 +134,7 @@ func (s *UserService) UpdateUser(id string, name, email string, isActive *bool) 
 
 	if email != "" {
 		// Check if another user with this email exists
-		existingUser, err := (*s.userRepo).GetUserByEmail(email)
+		existingUser, err := s.userRepo.GetUserByEmail(email)
 		if err == nil && existingUser.ID != user.ID {
 			return nil, errors.New("email already exists")
 		}
@@ -145,7 +145,7 @@ func (s *UserService) UpdateUser(id string, name, email string, isActive *bool) 
 		user.IsActive = *isActive
 	}
 
-	err = (*s.userRepo).UpdateUser(user)
+	err = s.userRepo.UpdateUser(user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
@@ -155,7 +155,7 @@ func (s *UserService) UpdateUser(id string, name, email string, isActive *bool) 
 
 // UpdateUserPassword updates user password
 func (s *UserService) UpdateUserPassword(id, newPassword string) error {
-	user, err := (*s.userRepo).GetUserByID(id)
+	user, err := s.userRepo.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("user not found")
@@ -168,7 +168,7 @@ func (s *UserService) UpdateUserPassword(id, newPassword string) error {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	err = (*s.userRepo).UpdateUser(user)
+	err = s.userRepo.UpdateUser(user)
 	if err != nil {
 		return fmt.Errorf("failed to update user password: %w", err)
 	}
@@ -178,7 +178,7 @@ func (s *UserService) UpdateUserPassword(id, newPassword string) error {
 
 // DeleteUser soft deletes a user
 func (s *UserService) DeleteUser(id string) error {
-	_, err := (*s.userRepo).GetUserByID(id)
+	_, err := s.userRepo.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("user not found")
@@ -186,7 +186,7 @@ func (s *UserService) DeleteUser(id string) error {
 		return fmt.Errorf("failed to get user: %w", err)
 	}
 
-	err = (*s.userRepo).DeleteUser(id)
+	err = s.userRepo.DeleteUser(id)
 	if err != nil {
 		return fmt.Errorf("failed to delete user: %w", err)
 	}
@@ -203,7 +203,7 @@ func (s *UserService) AddRoleToUser(userID string, roleID uint) error {
 	}
 
 	// Verify user exists
-	_, err = (*s.userRepo).GetUserByID(userID)
+	_, err = s.userRepo.GetUserByID(userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("user not found")
@@ -220,7 +220,7 @@ func (s *UserService) AddRoleToUser(userID string, roleID uint) error {
 		return fmt.Errorf("failed to get role: %w", err)
 	}
 
-	err = (*s.userRepo).AddRoleToUser(uint(uid), roleID)
+	err = s.userRepo.AddRoleToUser(uint(uid), roleID)
 	if err != nil {
 		return fmt.Errorf("failed to add role to user: %w", err)
 	}
@@ -237,7 +237,7 @@ func (s *UserService) RemoveRoleFromUser(userID string, roleID uint) error {
 	}
 
 	// Verify user exists
-	_, err = (*s.userRepo).GetUserByID(userID)
+	_, err = s.userRepo.GetUserByID(userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("user not found")
@@ -245,7 +245,7 @@ func (s *UserService) RemoveRoleFromUser(userID string, roleID uint) error {
 		return fmt.Errorf("failed to get user: %w", err)
 	}
 
-	err = (*s.userRepo).RemoveRoleFromUser(uint(uid), roleID)
+	err = s.userRepo.RemoveRoleFromUser(uint(uid), roleID)
 	if err != nil {
 		return fmt.Errorf("failed to remove role from user: %w", err)
 	}
@@ -261,7 +261,7 @@ func (s *UserService) GetUserRoles(userID string) ([]models.Role, error) {
 		return nil, errors.New("invalid user ID")
 	}
 
-	roles, err := (*s.userRepo).GetUserRoles(uint(uid))
+	roles, err := s.userRepo.GetUserRoles(uint(uid))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user roles: %w", err)
 	}
@@ -287,7 +287,7 @@ func (s *UserService) UpdateLastLogin(userID string) error {
 		return errors.New("invalid user ID")
 	}
 
-	err = (*s.userRepo).UpdateLastLogin(uint(uid))
+	err = s.userRepo.UpdateLastLogin(uint(uid))
 	if err != nil {
 		return fmt.Errorf("failed to update last login: %w", err)
 	}

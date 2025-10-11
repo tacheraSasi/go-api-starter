@@ -6,7 +6,6 @@ import (
 
 	"github.com/tacheraSasi/go-api-starter/internals/models"
 	"github.com/tacheraSasi/go-api-starter/internals/repositories"
-	"github.com/tacheraSasi/go-api-starter/internals/utils"
 	"gorm.io/gorm"
 )
 

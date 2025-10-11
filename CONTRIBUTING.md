@@ -25,23 +25,27 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 1. Fork the repository
 2. Clone your fork:
+
    ```bash
    git clone https://github.com/your-username/go-api-starter.git
    cd go-api-starter
    ```
 
 3. Install dependencies:
+
    ```bash
    make deps
    make install-tools
    ```
 
 4. Create a feature branch:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 5. Make your changes and test them:
+
    ```bash
    make test
    make lint
@@ -77,6 +81,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 ### Commit Messages
 
 Follow conventional commits format:
+
 - `feat: add new authentication method`
 - `fix: resolve database connection issue`
 - `docs: update API documentation`
@@ -88,6 +93,7 @@ Follow conventional commits format:
 ### Project Structure
 
 Please maintain the existing project structure:
+
 - `cmd/` - Application entry points
 - `internals/` - Private application code
 - `pkg/` - Public library code

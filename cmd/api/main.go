@@ -76,6 +76,9 @@ func main() {
 
 	// handlers
 	authHandler := handlers.NewAuthHandler(authService, cfg)
+	userHandler := handlers.NewUserHandler(userService)
+	roleHandler := handlers.NewRoleHandler(roleService)
+	permissionHandler := handlers.NewPermissionHandler(permissionService)
 	customerHandler := handlers.NewCustomerHandler(customerService)
 	invoiceHandler := handlers.NewInvoiceHandler(invoiceService)
 

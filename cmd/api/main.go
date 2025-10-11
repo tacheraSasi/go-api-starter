@@ -110,14 +110,14 @@ func main() {
 	protected.Use(middlewares.AuthMiddleware(tokenService, []byte(cfg.JWTSecret)))
 	{
 		protected.POST("/logout", authHandler.Logout)
-		
+
 		// User routes
 		protected.GET("/users/:id", userHandler.GetUser)
 		protected.PUT("/users/:id", userHandler.UpdateUser)
 		protected.PUT("/users/:id/password", userHandler.UpdateUserPassword)
 		protected.GET("/users/:id/roles", userHandler.GetUserRoles)
 		protected.GET("/users/:id/permissions/:resource/:action", userHandler.CheckUserPermission)
-		
+
 		// Customer routes
 		protected.GET("/customers", customerHandler.ListCustomers)
 		protected.GET("/customers/:id", customerHandler.GetCustomer)
@@ -142,7 +142,7 @@ func main() {
 		admin.DELETE("/users/:id", userHandler.DeleteUser)
 		admin.POST("/users/:id/roles/:roleId", userHandler.AddRoleToUser)
 		admin.DELETE("/users/:id/roles/:roleId", userHandler.RemoveRoleFromUser)
-		
+
 		// Role management
 		admin.POST("/roles", roleHandler.CreateRole)
 		admin.GET("/roles", roleHandler.ListRoles)
@@ -151,7 +151,7 @@ func main() {
 		admin.DELETE("/roles/:id", roleHandler.DeleteRole)
 		admin.POST("/roles/:id/permissions/:permissionId", roleHandler.AddPermissionToRole)
 		admin.DELETE("/roles/:id/permissions/:permissionId", roleHandler.RemovePermissionFromRole)
-		
+
 		// Permission management
 		admin.POST("/permissions", permissionHandler.CreatePermission)
 		admin.GET("/permissions", permissionHandler.ListPermissions)

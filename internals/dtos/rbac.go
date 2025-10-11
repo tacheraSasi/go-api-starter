@@ -18,14 +18,14 @@ type UpdatePasswordRequest struct {
 }
 
 type UserResponse struct {
-	ID        uint              `json:"id"`
-	Name      string            `json:"name"`
-	Email     string            `json:"email"`
-	IsActive  bool              `json:"is_active"`
-	LastLogin *string           `json:"last_login,omitempty"`
-	Roles     []RoleResponse    `json:"roles,omitempty"`
-	CreatedAt string            `json:"created_at"`
-	UpdatedAt string            `json:"updated_at"`
+	ID        uint           `json:"id"`
+	Name      string         `json:"name"`
+	Email     string         `json:"email"`
+	IsActive  bool           `json:"is_active"`
+	LastLogin *string        `json:"last_login,omitempty"`
+	Roles     []RoleResponse `json:"roles,omitempty"`
+	CreatedAt string         `json:"created_at"`
+	UpdatedAt string         `json:"updated_at"`
 }
 
 // Role DTOs
@@ -42,13 +42,13 @@ type UpdateRoleRequest struct {
 }
 
 type RoleResponse struct {
-	ID          uint                   `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	IsActive    bool                   `json:"is_active"`
-	Permissions []PermissionResponse   `json:"permissions,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
+	ID          uint                 `json:"id"`
+	Name        string               `json:"name"`
+	Description string               `json:"description"`
+	IsActive    bool                 `json:"is_active"`
+	Permissions []PermissionResponse `json:"permissions,omitempty"`
+	CreatedAt   string               `json:"created_at"`
+	UpdatedAt   string               `json:"updated_at"`
 }
 
 // Permission DTOs

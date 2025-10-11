@@ -11,6 +11,7 @@ help:
 	@echo "  dev           - Run in development mode with hot reload"
 	@echo "  build         - Build the application"
 	@echo "  run           - Build and run the application"
+	@echo "  seed          - Seed database with initial data"
 	@echo "  test          - Run tests"
 	@echo "  test-coverage - Run tests with coverage"
 	@echo "  lint          - Run linter"
@@ -18,6 +19,7 @@ help:
 	@echo "  clean         - Clean build artifacts"
 	@echo "  deps          - Download dependencies"
 	@echo "  security-check- Run security checks"
+	@echo "  install-tools - Install development tools"
 	@echo "  docker-build  - Build Docker image"
 	@echo "  docker-run    - Run Docker container"
 	@echo "  docker-up     - Start with docker-compose"
@@ -118,3 +120,8 @@ install-tools:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install golang.org/x/tools/cmd/goimports@latest
 	go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+
+# Seed database
+seed:
+	@echo "Seeding database..."
+	go run ./cmd/seed/main.go

@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tacheraSasi/go-api-starter/internals/config"
@@ -75,6 +74,7 @@ func main() {
 	}
 
 	// handlers
+	healthHandler := handlers.NewHealthHandler()
 	authHandler := handlers.NewAuthHandler(authService, cfg)
 	userHandler := handlers.NewUserHandler(userService)
 	roleHandler := handlers.NewRoleHandler(roleService)
@@ -89,14 +89,7 @@ func main() {
 	r.Use(middlewares.LoggingMiddleware(logger.Logger))
 	r.Use(middlewares.CORSMiddleware("*"))
 
-	// Health check route
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":    "ok",
-			"message":   "Go API Starter is running",
-			"timestamp": time.Now().UTC(),
-		})
-	})
+	r.GET("/health", healthHandler.HealthCheck)
 
 	// Public routes
 	public := r.Group("/api/v1")

@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -31,10 +33,24 @@ type Config struct {
 	JWTExpiresIn string
 	DBPath       string // For SQLite
 	LogFilePath  string
+	GINMode      string
+	CORSOrigins  []string
 }
 
 func LoadConfig() *Config {
 	godotenv.Load()
+
+	serverPort := getEnvAny("8080", "SERVER_PORT", "PORT")
+	jwtExpiresIn := getEnvAny("24", "JWT_EXPIRES_IN", "JWT_EXPIRY_HOURS")
+	logFilePath := getEnvAny("logs/app.log", "LOG_FILE_PATH")
+	ginMode := getEnvAny("release", "GIN_MODE")
+	corsAllowedOrigins := getEnvAny("*", "CORS_ALLOWED_ORIGINS")
+
+	origins := splitAndTrim(corsAllowedOrigins)
+	if len(origins) == 0 {
+		origins = []string{"*"}
+	}
+
 	return &Config{
 		DBType:       getEnv("DB_TYPE", "sqlite"),
 		DBHost:       getEnv("DB_HOST", "localhost"),
@@ -42,12 +58,24 @@ func LoadConfig() *Config {
 		DBUser:       getEnv("DB_USER", "user"),
 		DBPassword:   getEnv("DB_PASSWORD", "password"),
 		DBName:       getEnv("DB_NAME", "dbname"),
-		ServerPort:   getEnv("SERVER_PORT", "8080"),
+		ServerPort:   serverPort,
 		JWTSecret:    getEnv("JWT_SECRET", "secret"),
-		JWTExpiresIn: getEnv("JWT_EXPIRES_IN", "24"),//In hours
+		JWTExpiresIn: jwtExpiresIn,
 		DBPath:       getEnv("DB_PATH", "core.db"), // For SQLite
-		LogFilePath: "logs/app.log", // Log file path
+		LogFilePath:  logFilePath,
+		GINMode:      ginMode,
+		CORSOrigins:  origins,
 	}
+}
+
+func (c *Config) Validate() error {
+	if strings.TrimSpace(c.JWTSecret) == "" {
+		return fmt.Errorf("JWT_SECRET must not be empty")
+	}
+	if strings.TrimSpace(c.ServerPort) == "" {
+		return fmt.Errorf("SERVER_PORT must not be empty")
+	}
+	return nil
 }
 
 func (c *Config) Get(key ConfigKey) string {
@@ -70,4 +98,28 @@ func getEnv(key, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+func getEnvAny(defaultValue string, keys ...string) string {
+	for _, key := range keys {
+		if value, exists := os.LookupEnv(key); exists {
+			trimmed := strings.TrimSpace(value)
+			if trimmed != "" {
+				return trimmed
+			}
+		}
+	}
+	return defaultValue
+}
+
+func splitAndTrim(input string) []string {
+	parts := strings.Split(input, ",")
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }

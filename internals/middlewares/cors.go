@@ -1,21 +1,44 @@
 package middlewares
 
-import "github.com/gin-gonic/gin"
+import (
+	"strings"
+
+	"github.com/gin-gonic/gin"
+)
 
 func CORSMiddleware(origins ...string) gin.HandlerFunc {
-	// TODO: Figure out a way to manage multiple origins with allowing all
-    return func(c *gin.Context) {
-        origin := "*"
-        if len(origins) > 0 && origins[0] != "" {
-            origin = origins[0]
-        }
-        c.Header("Access-Control-Allow-Origin", origin)
-        c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
-        c.Next()
-    }
+	allowAll := len(origins) == 0
+	allowedOrigins := make(map[string]struct{}, len(origins))
+
+	for _, origin := range origins {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed == "" {
+			continue
+		}
+		if trimmed == "*" {
+			allowAll = true
+			continue
+		}
+		allowedOrigins[trimmed] = struct{}{}
+	}
+
+	return func(c *gin.Context) {
+		requestOrigin := c.GetHeader("Origin")
+		if allowAll {
+			c.Header("Access-Control-Allow-Origin", "*")
+		} else if requestOrigin != "" {
+			if _, ok := allowedOrigins[requestOrigin]; ok {
+				c.Header("Access-Control-Allow-Origin", requestOrigin)
+				c.Header("Vary", "Origin")
+			}
+		}
+
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Requested-With")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
 }

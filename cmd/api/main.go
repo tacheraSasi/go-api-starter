@@ -1,7 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tacheraSasi/go-api-starter/internals/config"
@@ -16,21 +22,41 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
+	if err := cfg.Validate(); err != nil {
+		log.Fatal("Invalid configuration:", err)
+	}
+
+	gin.SetMode(cfg.GINMode)
+
 	logger, logErr := logger.NewLogger(cfg.LogFilePath)
 	if logErr != nil {
 		log.Fatal("Failed to initialize logger:", logErr)
+	}
+	if cfg.JWTSecret == "secret" {
+		logger.Logger.Warn("Using default JWT secret. Set JWT_SECRET in production environments")
 	}
 
 	// Connect to database
 	err := database.Connect(
 		database.DBConfig{
 			Type:     cfg.DBType,
+			Host:     cfg.DBHost,
+			Port:     cfg.DBPort,
+			User:     cfg.DBUser,
+			Password: cfg.DBPassword,
+			DBName:   cfg.DBName,
+			SSLMode:  "disable",
 			FilePath: cfg.DBPath,
 		},
 	)
 	if err != nil {
 		log.Fatal("Database connection failed:", err)
 	}
+	defer func() {
+		if closeErr := database.Close(); closeErr != nil {
+			logger.Logger.WithError(closeErr).Error("failed to close database")
+		}
+	}()
 
 	// Auto migrate models
 	err = database.AutoMigrate(
@@ -83,13 +109,18 @@ func main() {
 	invoiceHandler := handlers.NewInvoiceHandler(invoiceService)
 
 	// Setup router
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
+	if err := r.SetTrustedProxies(nil); err != nil {
+		log.Fatal("Failed to set trusted proxies:", err)
+	}
 
 	// Global middlewares
 	r.Use(middlewares.LoggingMiddleware(logger.Logger))
-	r.Use(middlewares.CORSMiddleware("*"))
+	r.Use(middlewares.CORSMiddleware(cfg.CORSOrigins...))
 
 	r.GET("/health", healthHandler.HealthCheck)
+	r.GET("/health/ready", healthHandler.ReadinessCheck)
 
 	// Public routes
 	public := r.Group("/api/v1")
@@ -156,6 +187,32 @@ func main() {
 	}
 
 	// Start server
-	log.Printf("Server starting on :%s", cfg.ServerPort)
-	log.Fatal(r.Run(":" + cfg.ServerPort))
+	server := &http.Server{
+		Addr:              ":" + cfg.ServerPort,
+		Handler:           r,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+
+	go func() {
+		log.Printf("Server starting on :%s", cfg.ServerPort)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal("Server failed:", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Fatal("Server forced to shutdown:", err)
+	}
+
+	log.Println("Server exited gracefully")
 }

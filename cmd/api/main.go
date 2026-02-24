@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
 	"github.com/tacheraSasi/go-api-starter/internals/config"
 	"github.com/tacheraSasi/go-api-starter/internals/handlers"
@@ -18,6 +19,7 @@ import (
 	"github.com/tacheraSasi/go-api-starter/internals/services"
 	"github.com/tacheraSasi/go-api-starter/pkg/database"
 	"github.com/tacheraSasi/go-api-starter/pkg/logger"
+	"github.com/tacheraSasi/go-api-starter/views"
 )
 
 func main() {
@@ -121,6 +123,11 @@ func main() {
 
 	r.GET("/health", healthHandler.HealthCheck)
 	r.GET("/health/ready", healthHandler.ReadinessCheck)
+
+	//Home page
+	r.GET("/", func(c *gin.Context) {
+		templ.Handler(views.Home(views.HomeProps{AppName: "Go API Starter"})).ServeHTTP(c.Writer, c.Request)
+	})
 
 	// Public routes
 	public := r.Group("/api/v1")

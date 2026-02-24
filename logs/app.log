@@ -193,3 +193,41 @@
   "time": "2025-09-05T09:46:13+03:00",
   "user_agent": "PostmanRuntime/7.45.0"
 }
+{
+  "level": "warning",
+  "msg": "Using default JWT secret. Set JWT_SECRET in production environments",
+  "time": "2026-02-24T15:10:03+03:00"
+}
+{
+  "level": "warning",
+  "msg": "Using default JWT secret. Set JWT_SECRET in production environments",
+  "time": "2026-02-24T15:10:35+03:00"
+}
+{
+  "client_ip": "::1",
+  "content_type": "",
+  "latency_ms": 1,
+  "level": "info",
+  "method": "GET",
+  "msg": "Request completed",
+  "path": "/",
+  "request_id": "",
+  "response_size": 109,
+  "status": 200,
+  "time": "2026-02-24T15:10:47+03:00",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+}
+{
+  "client_ip": "::1",
+  "content_type": "",
+  "latency_ms": 0,
+  "level": "info",
+  "method": "GET",
+  "msg": "Request completed",
+  "path": "/favicon.ico",
+  "request_id": "",
+  "response_size": -1,
+  "status": 404,
+  "time": "2026-02-24T15:10:47+03:00",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+}

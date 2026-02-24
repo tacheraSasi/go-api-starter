@@ -48,7 +48,7 @@ func Connect(config DBConfig) error {
 	}
 
 	db, err := gorm.Open(dialector, &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to connect to %s database: %v", config.Type, err)

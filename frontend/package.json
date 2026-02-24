@@ -1,0 +1,117 @@
+{
+  "name": "tanstack-router-query-template",
+  "version": "1.2.0",
+  "description": "A TypeScript React(v19) template using @tanstack/react-router & @tanstack-react-query",
+  "keywords": [
+    "react",
+    "react-template",
+    "tanstack-router-query-template",
+    "typescript-react-template",
+    "template",
+    "react-query-template",
+    "tanstack-router-template",
+    "tanstack-react-router-template",
+    "tanstack-react-query-template",
+    "react-typescript-template",
+    "husky",
+    "commitlint",
+    "cz-git",
+    "i18",
+    "react-template-i18n",
+    "react-19"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashwin1014/react-tanstack-router-query-template"
+  },
+  "license": "MIT",
+  "author": "Ashwin Bordoloi <ashwin1014@live.com> (https://github.com/ashwin1014)",
+  "type": "module",
+  "scripts": {
+    "build": "NODE_ENV=production tsc && vite build",
+    "build:staging": "NODE_ENV=production tsc && vite build --mode staging",
+    "commit": "git cz",
+    "dev": "NODE_ENV=development vite",
+    "dev:prod": "NODE_ENV=development vite --mode production",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "gen:scss-types": "typed-scss-modules src --watch",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.json --report-unused-disable-directives --max-warnings 0",
+    "prepare": "husky",
+    "preview": "vite preview"
+  },
+  "lint-staged": {
+    "apps/**/*.{js,ts,jsx,tsx}": [
+      "eslint --fix"
+    ],
+    "packages/**/*.{js,ts,jsx,tsx}": [
+      "eslint --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ],
+    "package.json": "npx sort-package-json"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "dependencies": {
+    "@tanstack/query-sync-storage-persister": "5.74.4",
+    "@tanstack/react-query": "5.74.4",
+    "@tanstack/react-query-persist-client": "5.74.4",
+    "@tanstack/react-router": "1.116.0",
+    "@tanstack/react-table": "8.21.3",
+    "axios": "1.8.4",
+    "i18next": "25.0.0",
+    "immer": "10.1.1",
+    "radash": "12.1.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-i18next": "15.4.1",
+    "sass": "1.86.3",
+    "zod": "3.24.3"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.8.0",
+    "@commitlint/config-conventional": "19.8.0",
+    "@commitlint/is-ignored": "19.8.0",
+    "@tanstack/eslint-plugin-query": "5.73.3",
+    "@tanstack/react-query-devtools": "5.74.4",
+    "@tanstack/router-devtools": "1.116.0",
+    "@tanstack/router-vite-plugin": "1.116.1",
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2",
+    "@typescript-eslint/eslint-plugin": "7.2.0",
+    "@typescript-eslint/parser": "7.2.0",
+    "@vitejs/plugin-react": "4.2.1",
+    "commitizen": "4.3.1",
+    "cz-conventional-changelog": "3.3.0",
+    "cz-git": "1.11.1",
+    "eslint": "8.57.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-airbnb-typescript": "18.0.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-import-resolver-typescript": "3.6.1",
+    "eslint-plugin-deprecation": "2.0.0",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-jsonc": "2.13.0",
+    "eslint-plugin-jsx-a11y": "6.5.1",
+    "eslint-plugin-jsx-control-statements": "3.0.0",
+    "eslint-plugin-prettier": "5.1.3",
+    "eslint-plugin-react": "7.34.1",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-refresh": "0.4.19",
+    "eslint-plugin-sort-keys-fix": "1.1.2",
+    "eslint-plugin-typescript-sort-keys": "3.2.0",
+    "husky": "9.1.7",
+    "lint-staged": "15.5.1",
+    "pino": "9.6.0",
+    "pino-pretty": "13.0.0",
+    "react-geiger": "1.2.1",
+    "rimraf": "6.0.1",
+    "typed-scss-modules": "8.1.1",
+    "typescript": "5.4.2",
+    "vite": "5.1.6"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "componentsDir": "components",
+  "utilsDir": "utils",
+  "moduleName": "github.com/tacheraSasi/go-api-starter",
+  "jsDir": "assets/js",
+  "jsPublicPath": "/assets/js"
+}

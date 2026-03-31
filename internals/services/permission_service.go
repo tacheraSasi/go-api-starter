@@ -126,8 +126,6 @@ func (s *PermissionService) DeletePermission(id uint) error {
 func (s *PermissionService) InitializeDefaultPermissions() error {
 	resources := []string{
 		models.ResourceUser,
-		models.ResourceCustomer,
-		models.ResourceInvoice,
 		models.ResourceRole,
 		models.ResourceSystem,
 	}

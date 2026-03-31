@@ -33,9 +33,6 @@ func main() {
 		&models.Permission{},
 		&models.UserRole{},
 		&models.RolePermission{},
-		&models.Customer{},
-		&models.Invoice{},
-		&models.InvoiceItem{},
 		&models.BlacklistedToken{},
 	)
 	if err != nil {
@@ -96,10 +93,6 @@ func main() {
 			resource string
 			action   string
 		}{
-			{models.ResourceCustomer, models.ActionRead},
-			{models.ResourceCustomer, models.ActionList},
-			{models.ResourceInvoice, models.ActionRead},
-			{models.ResourceInvoice, models.ActionList},
 			{models.ResourceUser, models.ActionRead}, // Own profile
 		}
 

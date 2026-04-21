@@ -35,6 +35,13 @@ type Config struct {
 	LogFilePath  string
 	GINMode      string
 	CORSOrigins  []string
+
+	// Redis / asynq
+	RedisURL string
+
+	// Asynqmon monitoring dashboard
+	MonitoringUser     string
+	MonitoringPassword string
 }
 
 func LoadConfig() *Config {
@@ -65,6 +72,10 @@ func LoadConfig() *Config {
 		LogFilePath:  logFilePath,
 		GINMode:      ginMode,
 		CORSOrigins:  origins,
+
+		RedisURL:           getEnv("REDIS_URL", "redis://localhost:6379"),
+		MonitoringUser:     getEnv("MONITORING_USER", "admin"),
+		MonitoringPassword: getEnv("MONITORING_PASSWORD", "changeme"),
 	}
 }
 

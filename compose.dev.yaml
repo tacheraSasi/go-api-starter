@@ -1,21 +1,47 @@
 version: "3.8"
 
 services:
-  api:
+  core:
     build:
       context: .
       dockerfile: Dockerfile.dev
     environment:
       - GIN_MODE=debug
       - DB_TYPE=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=go_api_starter_dev
       - DB_PATH=postgres://postgres:password@db:5432/go_api_starter_dev?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+      - MONITORING_USER=admin
+      - MONITORING_PASSWORD=admin
     volumes:
       - .:/app
       - /app/bin
-    command: go run /app/cmd/api/main.go
+    command: go run /app/cmd/core/main.go
     ports:
       - "8080:8080"
       - "2345:2345" # Delve debugger port
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - DB_TYPE=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=go_api_starter_dev
+      - DB_PATH=postgres://postgres:password@db:5432/go_api_starter_dev?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+      - /app/bin
+    command: go run /app/cmd/worker/main.go
 
   # Adminer for database management
   adminer:

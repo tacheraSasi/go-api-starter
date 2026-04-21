@@ -1,29 +1,36 @@
 APP_NAME=go-api-starter
 BINARY_NAME=bin/api
+BINARY_CORE=bin/core
+BINARY_WORKER=bin/worker
 DOCKER_IMAGE_NAME=go-api-starter
 DOCKER_CONTAINER_NAME=go-api-starter-container
 
-.PHONY: help dev build run test lint fmt clean docker-build docker-run docker-up docker-down deps security-check
+.PHONY: help dev build build-core build-worker run run-core run-worker test lint fmt clean docker-build docker-run docker-up docker-down deps security-check
 
 # Show help
 help:
 	@echo "Available commands:"
-	@echo "  dev           - Run in development mode with hot reload"
-	@echo "  build         - Build the application"
-	@echo "  run           - Build and run the application"
-	@echo "  seed          - Seed database with initial data"
-	@echo "  test          - Run tests"
-	@echo "  test-coverage - Run tests with coverage"
-	@echo "  lint          - Run linter"
-	@echo "  fmt           - Format code"
-	@echo "  clean         - Clean build artifacts"
-	@echo "  deps          - Download dependencies"
-	@echo "  security-check- Run security checks"
-	@echo "  install-tools - Install development tools"
-	@echo "  docker-build  - Build Docker image"
-	@echo "  docker-run    - Run Docker container"
-	@echo "  docker-up     - Start with docker-compose"
-	@echo "  docker-down   - Stop docker-compose"
+	@echo "  dev             - Run API in development mode with hot reload"
+	@echo "  build           - Build the legacy API binary (cmd/api)"
+	@echo "  build-core      - Build the core binary (cmd/core — API + asynqmon)"
+	@echo "  build-worker    - Build the worker binary (cmd/worker — asynq server)"
+	@echo "  build-all       - Build core + worker"
+	@echo "  run             - Build and run the legacy API"
+	@echo "  run-core        - Build and run the core binary"
+	@echo "  run-worker      - Build and run the worker binary"
+	@echo "  seed            - Seed database with initial data"
+	@echo "  test            - Run tests"
+	@echo "  test-coverage   - Run tests with coverage"
+	@echo "  lint            - Run linter"
+	@echo "  fmt             - Format code"
+	@echo "  clean           - Clean build artifacts"
+	@echo "  deps            - Download dependencies"
+	@echo "  security-check  - Run security checks"
+	@echo "  install-tools   - Install development tools"
+	@echo "  docker-build    - Build Docker image"
+	@echo "  docker-run      - Run Docker container"
+	@echo "  docker-up       - Start with docker-compose"
+	@echo "  docker-down     - Stop docker-compose"
 
 # Development mode
 dev:
@@ -36,16 +43,41 @@ deps:
 	go mod download
 	go mod tidy
 
-# Build the application
+# Build the legacy API binary
 build:
 	@echo "Building $(APP_NAME)..."
 	@mkdir -p bin
 	go build -ldflags="-w -s" -o $(BINARY_NAME) ./cmd/api/main.go
 
-# Build and run
+# Build core binary (API + asynq client + asynqmon)
+build-core:
+	@echo "Building core…"
+	@mkdir -p bin
+	go build -ldflags="-w -s" -o $(BINARY_CORE) ./cmd/core
+
+# Build worker binary (asynq server + scheduler)
+build-worker:
+	@echo "Building worker…"
+	@mkdir -p bin
+	go build -ldflags="-w -s" -o $(BINARY_WORKER) ./cmd/worker
+
+# Build both
+build-all: build-core build-worker
+
+# Build and run legacy API
 run: build
 	@echo "Running $(APP_NAME)..."
 	./$(BINARY_NAME)
+
+# Run core
+run-core: build-core
+	@echo "Running core…"
+	./$(BINARY_CORE)
+
+# Run worker
+run-worker: build-worker
+	@echo "Running worker…"
+	./$(BINARY_WORKER)
 
 # Run tests
 test:

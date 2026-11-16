@@ -1,53 +1,129 @@
-version: "3.8"
+# ============================================================================
+# Development stack. Source is bind-mounted into the container.
+#   core     runs with air (hot reload)
+#   minion   runs with `go run`
+#   overseer runs with `go run`
+#
+# Usage:
+#   docker compose -f compose.dev.yaml up --build
+# ============================================================================
+
+name: go-api-starter-dev
 
 services:
   core:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: docker/Dockerfile.dev
     environment:
       - GIN_MODE=debug
+      - SERVER_PORT=8080
+      - JWT_SECRET=dev-secret-change-me
+      - TIMEZONE=${TIMEZONE:-UTC}
       - DB_TYPE=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=go_api_starter_dev
-      - DB_PATH=postgres://postgres:password@db:5432/go_api_starter_dev?sslmode=disable
+      - DATABASE_URL=postgres://postgres:password@db:5432/go_api_starter_dev?sslmode=disable
+      - DB_SSL_MODE=disable
+      - LOG_FILE_PATH=logs/app.log
       - REDIS_URL=redis://redis:6379
       - MONITORING_USER=admin
       - MONITORING_PASSWORD=admin
     volumes:
       - .:/app
       - /app/bin
-    command: go run /app/cmd/core/main.go
+    command: air -c .air.toml
     ports:
       - "8080:8080"
-      - "2345:2345" # Delve debugger port
+      - "2345:2345" # Delve debugger
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
 
-  worker:
+  minion:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: docker/Dockerfile.dev
     environment:
+      - TIMEZONE=${TIMEZONE:-UTC}
       - DB_TYPE=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=go_api_starter_dev
-      - DB_PATH=postgres://postgres:password@db:5432/go_api_starter_dev?sslmode=disable
+      - DATABASE_URL=postgres://postgres:password@db:5432/go_api_starter_dev?sslmode=disable
+      - DB_SSL_MODE=disable
       - REDIS_URL=redis://redis:6379
     volumes:
       - .:/app
       - /app/bin
-    command: go run /app/cmd/worker/main.go
+    command: go run ./cmd/minion
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
 
-  # Adminer for database management
+  overseer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    environment:
+      - TIMEZONE=${TIMEZONE:-UTC}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+      - /app/bin
+    command: go run ./cmd/overseer
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: go_api_starter_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d go_api_starter_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - app-network
+
   adminer:
     image: adminer:latest
     ports:
       - "8081:8080"
+    depends_on:
+      - db
     networks:
       - app-network
     restart: unless-stopped
+
+volumes:
+  postgres_dev_data:
+
+networks:
+  app-network:
+    driver: bridge

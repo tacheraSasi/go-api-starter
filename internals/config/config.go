@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -23,11 +24,13 @@ const (
 
 type Config struct {
 	DBType       string
+	DatabaseURL  string
 	DBHost       string
 	DBPort       string
 	DBUser       string
 	DBPassword   string
 	DBName       string
+	DBSSLMode    string
 	ServerPort   string
 	JWTSecret    string
 	JWTExpiresIn string
@@ -35,6 +38,7 @@ type Config struct {
 	LogFilePath  string
 	GINMode      string
 	CORSOrigins  []string
+	Timezone     string
 
 	// Redis / asynq
 	RedisURL string
@@ -45,7 +49,15 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	godotenv.Load()
+	// Try .env from the current directory and a couple of parents so the
+	// binaries work whether they are started from the repo root or cmd/<svc>.
+	for _, path := range []string{".env", "../.env", "../../.env"} {
+		if _, err := os.Stat(path); err == nil {
+			_ = godotenv.Load(path)
+			break
+		}
+	}
+	_ = godotenv.Load()
 
 	serverPort := getEnvAny("8080", "SERVER_PORT", "PORT")
 	jwtExpiresIn := getEnvAny("24", "JWT_EXPIRES_IN", "JWT_EXPIRY_HOURS")
@@ -60,11 +72,13 @@ func LoadConfig() *Config {
 
 	return &Config{
 		DBType:       getEnv("DB_TYPE", "sqlite"),
+		DatabaseURL:  getEnvAny("", "DATABASE_URL", "DB_URL"),
 		DBHost:       getEnv("DB_HOST", "localhost"),
 		DBPort:       getEnv("DB_PORT", "5432"),
 		DBUser:       getEnv("DB_USER", "user"),
 		DBPassword:   getEnv("DB_PASSWORD", "password"),
 		DBName:       getEnv("DB_NAME", "dbname"),
+		DBSSLMode:    getEnv("DB_SSL_MODE", "disable"),
 		ServerPort:   serverPort,
 		JWTSecret:    getEnv("JWT_SECRET", "secret"),
 		JWTExpiresIn: jwtExpiresIn,
@@ -72,6 +86,7 @@ func LoadConfig() *Config {
 		LogFilePath:  logFilePath,
 		GINMode:      ginMode,
 		CORSOrigins:  origins,
+		Timezone:     getEnv("TIMEZONE", "UTC"),
 
 		RedisURL:           getEnv("REDIS_URL", "redis://localhost:6379"),
 		MonitoringUser:     getEnv("MONITORING_USER", "admin"),
@@ -85,6 +100,17 @@ func (c *Config) Validate() error {
 	}
 	if strings.TrimSpace(c.ServerPort) == "" {
 		return fmt.Errorf("SERVER_PORT must not be empty")
+	}
+	if _, err := time.LoadLocation(c.Timezone); err != nil {
+		return fmt.Errorf("TIMEZONE %q is invalid: %w", c.Timezone, err)
+	}
+	// When using postgres or mysql, either DATABASE_URL or the individual
+	// DB fields must be set.
+	if c.DBType == "postgres" || c.DBType == "mysql" {
+		if strings.TrimSpace(c.DatabaseURL) == "" &&
+			(strings.TrimSpace(c.DBHost) == "" || strings.TrimSpace(c.DBName) == "") {
+			return fmt.Errorf("DATABASE_URL or DB_HOST+DB_NAME must be set for %s", c.DBType)
+		}
 	}
 	return nil
 }

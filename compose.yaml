@@ -1,28 +1,39 @@
-version: "3.8"
+# ============================================================================
+# Production-style stack for the three services:
+#   core     HTTP API + asynq client + asynqmon dashboard
+#   minion   asynq worker (no HTTP port, scale horizontally)
+#   overseer asynq cron scheduler (exactly one replica)
+#
+# Usage:
+#   cp .env.example .env   # optional, values below have dev defaults
+#   docker compose up -d --build
+# ============================================================================
+
+name: go-api-starter
 
 services:
-  # Core API server + asynqmon dashboard
+  # ── API server ────────────────────────────────────────────────────────────
   core:
     build:
       context: .
       dockerfile: docker/Dockerfile
+      target: final
     ports:
       - "8080:8080"
     environment:
-      - GIN_MODE=release
+      - GIN_MODE=${GIN_MODE:-release}
+      - SERVER_PORT=${SERVER_PORT:-8080}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-*}
+      - TIMEZONE=${TIMEZONE:-UTC}
       - DB_TYPE=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=go_api_starter
-      - DB_PATH=postgres://postgres:password@db:5432/go_api_starter?sslmode=disable
-      - JWT_SECRET=your-super-secret-jwt-key-change-this
-      - JWT_EXPIRY_HOURS=24
+      - DATABASE_URL=postgres://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-go_api_starter}?sslmode=disable
+      - DB_SSL_MODE=disable
       - LOG_FILE_PATH=/app/logs/app.log
       - REDIS_URL=redis://redis:6379
-      - MONITORING_USER=admin
-      - MONITORING_PASSWORD=changeme
+      - MONITORING_USER=${MONITORING_USER:-admin}
+      - MONITORING_PASSWORD=${MONITORING_PASSWORD:-changeme}
     volumes:
       - ./logs:/app/logs
       - ./data:/app/data
@@ -30,66 +41,116 @@ services:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
     networks:
       - app-network
     restart: unless-stopped
 
-  # Minion — asynq worker + scheduler (no HTTP port)
+  # ── Background worker (scale with --scale minion=N) ───────────────────────
   minion:
     build:
       context: .
-      dockerfile: docker/Dockerfile.worker
+      dockerfile: docker/Dockerfile.minion
+      target: final
     environment:
+      - TIMEZONE=${TIMEZONE:-UTC}
       - DB_TYPE=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=go_api_starter
-      - DB_PATH=postgres://postgres:password@db:5432/go_api_starter?sslmode=disable
+      - DATABASE_URL=postgres://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-go_api_starter}?sslmode=disable
+      - DB_SSL_MODE=disable
       - REDIS_URL=redis://redis:6379
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     networks:
       - app-network
     restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  # PostgreSQL database
+  # ── Cron scheduler (exactly one replica) ──────────────────────────────────
+  overseer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.overseer
+      target: final
+    environment:
+      - TIMEZONE=${TIMEZONE:-UTC}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 256m
+        reservations:
+          memory: 64m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── PostgreSQL ────────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     environment:
-      - POSTGRES_DB=go_api_starter
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      POSTGRES_DB: ${DB_NAME:-go_api_starter}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-go_api_starter}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
     networks:
       - app-network
     restart: unless-stopped
 
-  # Redis — shared message broker for asynq
+  # ── Redis (asynq broker + monitoring) ─────────────────────────────────────
   redis:
     image: redis:7-alpine
     expose:
       - "6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - app-network
     restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy noeviction
 
 volumes:
   postgres_data:
@@ -98,4 +159,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-

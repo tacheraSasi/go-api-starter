@@ -94,9 +94,13 @@ Follow conventional commits format:
 
 Please maintain the existing project structure:
 
-- `cmd/` - Application entry points
+- `cmd/core/` - HTTP API service
+- `cmd/minion/` - asynq worker service
+- `cmd/overseer/` - asynq cron scheduler service
+- `cmd/seed/` - database seeder
 - `internals/` - Private application code
 - `pkg/` - Public library code
+- `docker/` - Dockerfiles for each service
 - `scripts/` - Build and deployment scripts
 
 ### Dependencies

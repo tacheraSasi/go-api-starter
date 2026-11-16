@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+
+# Development image used by compose.dev.yaml.
+# Hot reload for core via air; minion and overseer can run with `go run`.
+FROM golang:1.25.0-alpine AS development
+
+RUN apk add --no-cache git ca-certificates tzdata gcc musl-dev
+
+RUN go install github.com/air-verse/air@latest && \
+    go install github.com/go-delve/delve/cmd/dlv@latest
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN mkdir -p logs data bin
+
+EXPOSE 8080 2345
+
+CMD ["air", "-c", ".air.toml"]

@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1
+
+################################################################################
+# minion: asynq worker, consumes tasks from Redis (no HTTP port)
+################################################################################
+
+ARG GO_VERSION=1.25.0
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS build
+
+WORKDIR /src
+
+# CGO is needed if the worker uses the SQLite driver.
+RUN apk add --no-cache gcc musl-dev
+
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    for i in $(seq 1 5); do \
+      go mod download && { echo "[go] modules downloaded via proxy"; exit 0; }; \
+      echo "[go] download attempt $i/5 failed, retrying in 5s..."; \
+      sleep 5; \
+    done; \
+    for i in $(seq 1 3); do \
+      GOPROXY=direct go mod download && { echo "[go] modules downloaded via direct"; exit 0; }; \
+      echo "[go] direct attempt $i/3 failed, retrying in 5s..."; \
+      sleep 5; \
+    done; \
+    echo "[go] go mod download failed after all retries"; \
+    exit 1
+
+ARG TARGETARCH
+
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,target=. \
+    CGO_ENABLED=1 GOARCH=$TARGETARCH \
+    go build -ldflags="-w -s" -o /bin/minion ./cmd/minion
+
+################################################################################
+# Runtime
+################################################################################
+FROM alpine:3.21 AS final
+
+RUN apk --no-cache add \
+    ca-certificates \
+    tzdata \
+    libc6-compat \
+    && update-ca-certificates
+
+RUN mkdir -p /app/logs /app/data
+
+WORKDIR /app
+
+COPY --from=build /bin/minion /bin/minion
+
+ENV DB_TYPE=postgres \
+    LOG_FILE_PATH=
+
+ENTRYPOINT ["/bin/minion"]

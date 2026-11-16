@@ -1,6 +1,7 @@
 package main
 
-import (	"context"
+import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -29,6 +30,12 @@ func main() {
 		log.Fatal("Invalid configuration:", err)
 	}
 
+	location, err := time.LoadLocation(cfg.Timezone)
+	if err != nil {
+		log.Fatal("Failed to load timezone:", err)
+	}
+	time.Local = location
+
 	gin.SetMode(cfg.GINMode)
 
 	logger, logErr := logger.NewLogger(cfg.LogFilePath)
@@ -40,16 +47,17 @@ func main() {
 	}
 
 	// Connect to database
-	err := database.Connect(
+	err = database.Connect(
 		database.DBConfig{
-			Type:     cfg.DBType,
-			Host:     cfg.DBHost,
-			Port:     cfg.DBPort,
-			User:     cfg.DBUser,
-			Password: cfg.DBPassword,
-			DBName:   cfg.DBName,
-			SSLMode:  "disable",
-			FilePath: cfg.DBPath,
+			Type:        cfg.DBType,
+			DatabaseURL: cfg.DatabaseURL,
+			Host:        cfg.DBHost,
+			Port:        cfg.DBPort,
+			User:        cfg.DBUser,
+			Password:    cfg.DBPassword,
+			DBName:      cfg.DBName,
+			SSLMode:     cfg.DBSSLMode,
+			FilePath:    cfg.DBPath,
 		},
 	)
 	if err != nil {
@@ -61,15 +69,9 @@ func main() {
 		}
 	}()
 
-	// Auto migrate models
-	err = database.AutoMigrate(
-		&models.User{},
-		&models.Role{},
-		&models.Permission{},
-		&models.UserRole{},
-		&models.RolePermission{},
-		&models.BlacklistedToken{},
-	)
+	// Auto migrate models. Core owns schema changes; minion and overseer
+	// never migrate.
+	err = database.AutoMigrate(models.All()...)
 	if err != nil {
 		log.Fatal("Auto migration failed:", err)
 	}

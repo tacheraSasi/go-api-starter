@@ -19,22 +19,22 @@ func main() {
 
 	// Connect to database
 	err := database.Connect(database.DBConfig{
-		Type:     cfg.DBType,
-		FilePath: cfg.DBPath,
+		Type:        cfg.DBType,
+		DatabaseURL: cfg.DatabaseURL,
+		Host:        cfg.DBHost,
+		Port:        cfg.DBPort,
+		User:        cfg.DBUser,
+		Password:    cfg.DBPassword,
+		DBName:      cfg.DBName,
+		SSLMode:     cfg.DBSSLMode,
+		FilePath:    cfg.DBPath,
 	})
 	if err != nil {
 		log.Fatal("Database connection failed:", err)
 	}
 
 	// Auto migrate models
-	err = database.AutoMigrate(
-		&models.User{},
-		&models.Role{},
-		&models.Permission{},
-		&models.UserRole{},
-		&models.RolePermission{},
-		&models.BlacklistedToken{},
-	)
+	err = database.AutoMigrate(models.All()...)
 	if err != nil {
 		log.Fatal("Auto migration failed:", err)
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hibiken/asynq"
-	"github.com/tacheraSasi/go-api-starter/internals/tasks"
+	"github.com/tacheraSasi/go-api-starter/internals/minions"
 )
 
 // NotificationService enqueues async notification tasks via asynq.
@@ -20,12 +20,12 @@ func NewNotificationService(client *asynq.Client) *NotificationService {
 
 // SendSMSAsync enqueues an SMS delivery task on the "critical" queue (max 3 retries).
 func (s *NotificationService) SendSMSAsync(to, message string) error {
-	payload, err := json.Marshal(tasks.SMSPayload{To: to, Message: message})
+	payload, err := json.Marshal(minions.SMSPayload{To: to, Message: message})
 	if err != nil {
 		return fmt.Errorf("marshal SMS payload: %w", err)
 	}
 
-	task := asynq.NewTask(tasks.TypeNotificationSMS, payload)
+	task := asynq.NewTask(minions.TaskSendSMS, payload)
 	_, err = s.client.Enqueue(task,
 		asynq.Queue("critical"),
 		asynq.MaxRetry(3),
@@ -38,12 +38,12 @@ func (s *NotificationService) SendSMSAsync(to, message string) error {
 
 // SendEmailAsync enqueues an email delivery task on the "critical" queue (max 3 retries).
 func (s *NotificationService) SendEmailAsync(to, subject, body string) error {
-	payload, err := json.Marshal(tasks.EmailPayload{To: to, Subject: subject, Body: body})
+	payload, err := json.Marshal(minions.EmailPayload{To: to, Subject: subject, Body: body})
 	if err != nil {
 		return fmt.Errorf("marshal email payload: %w", err)
 	}
 
-	task := asynq.NewTask(tasks.TypeNotificationEmail, payload)
+	task := asynq.NewTask(minions.TaskSendEmail, payload)
 	_, err = s.client.Enqueue(task,
 		asynq.Queue("critical"),
 		asynq.MaxRetry(3),

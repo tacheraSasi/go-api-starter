@@ -14,14 +14,15 @@ import (
 
 // DBConfig holds database connection parameters
 type DBConfig struct {
-	Type     string // Database type: "mysql", "postgres", "sqlite"
-	Host     string
-	Port     string
-	User     string
-	Password string
-	DBName   string
-	SSLMode  string // For PostgreSQL
-	FilePath string // For SQLite
+	Type        string // Database type: "mysql", "postgres", "sqlite"
+	DatabaseURL string // Optional full DSN (postgres://...); takes precedence
+	Host        string
+	Port        string
+	User        string
+	Password    string
+	DBName      string
+	SSLMode     string // For PostgreSQL
+	FilePath    string // For SQLite
 }
 
 var DB *gorm.DB
@@ -33,12 +34,20 @@ func Connect(config DBConfig) error {
 
 	switch config.Type {
 	case "postgres":
-		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-			config.Host, config.Port, config.User, config.Password, config.DBName, config.SSLMode)
+		if config.DatabaseURL != "" {
+			dsn = config.DatabaseURL
+		} else {
+			dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+				config.Host, config.Port, config.User, config.Password, config.DBName, config.SSLMode)
+		}
 		dialector = postgres.Open(dsn)
 	case "mysql":
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-			config.User, config.Password, config.Host, config.Port, config.DBName)
+		if config.DatabaseURL != "" {
+			dsn = config.DatabaseURL
+		} else {
+			dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+				config.User, config.Password, config.Host, config.Port, config.DBName)
+		}
 		dialector = mysql.Open(dsn)
 	case "sqlite":
 		dsn = config.FilePath
@@ -93,4 +102,3 @@ func Close() error {
 	}
 	return sqlDB.Close()
 }
-

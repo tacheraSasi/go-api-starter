@@ -1,22 +1,50 @@
-### Building and running your application
+# Docker
 
-When you're ready, start your application by running:
-`docker compose up --build`.
+The stack has three application services plus PostgreSQL and Redis.
 
-Your application will be available at http://localhost:8080.
+| Service    | Binary            | Purpose                                      |
+| ---------- | ----------------- | -------------------------------------------- |
+| `core`     | `cmd/core`        | HTTP API, asynq client, asynqmon dashboard   |
+| `minion`   | `cmd/minion`      | asynq worker, consumes tasks from Redis      |
+| `overseer` | `cmd/overseer`    | asynq cron scheduler, enqueues recurring jobs|
+| `db`       | postgres:16       | application database                         |
+| `redis`    | redis:7           | asynq broker                                 |
 
-### Deploying your application to the cloud
+## Production-style stack
 
-First, build your image, e.g.: `docker build -t myapp .`.
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
-`docker build --platform=linux/amd64 -t myapp .`.
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
 
-Then, push it to your registry, e.g. `docker push myregistry.com/myapp`.
+The API is available at `http://localhost:8080` and Asynqmon at
+`http://localhost:8080/monitoring`.
 
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
+Scale workers independently:
 
-### References
-* [Docker's Go guide](https://docs.docker.com/language/golang/)
+```bash
+docker compose up -d --scale minion=3
+```
+
+Do not scale `overseer`: every replica registers the same cron schedules and
+tasks would be enqueued more than once.
+
+## Development stack
+
+```bash
+docker compose -f compose.dev.yaml up --build
+```
+
+`core` runs with air for hot reload. `minion` and `overseer` run with `go run`.
+
+## Building images directly
+
+```bash
+docker build -f docker/Dockerfile -t go-api-starter-core .
+docker build -f docker/Dockerfile.minion -t go-api-starter-minion .
+docker build -f docker/Dockerfile.overseer -t go-api-starter-overseer .
+```
+
+`core` and `minion` are built with CGO enabled so the SQLite driver works.
+`overseer` does not touch the database and is built with CGO disabled as a
+small non-root image.

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Three-service architecture: `core` (API), `minion` (asynq worker), and `overseer` (cron scheduler)
+- Dedicated Dockerfiles and Compose stacks for each service
+- `internals/minions` package for task types and handlers
+- Service logger and asynq logger adapter in `pkg/logger`
+- `DATABASE_URL`, `DB_SSL_MODE`, and `TIMEZONE` configuration
 - Initial Go API starter template
 - JWT authentication system
 - Multi-database support (SQLite, PostgreSQL, MySQL)
